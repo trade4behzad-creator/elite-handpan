@@ -1,0 +1,20 @@
+{
+  "nav": {
+    "products": "Products",
+    "contact": "Contact"
+  },
+  "hero": {
+    "eyebrow": "Forged From Light",
+    "title": "Elite Handpan",
+    "subtitle": "Where metal speaks in frequencies"
+  },
+  "products": {
+    "heading": "Instruments",
+    "notes": "Notes",
+    "cta": "Inquire"
+  },
+  "contact": {
+    "heading": "Get in Touch",
+    "tagline": "Each instrument is handcrafted to order."
+  }
+}
