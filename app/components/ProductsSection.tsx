@@ -22,7 +22,7 @@ export default function ProductsSection({
   return (
     <section
       id="products"
-      className="bg-[#080808] py-28 px-6 md:px-16"
+      className="bg-[#080808] py-28 px-4 md:px-8 lg:px-16"
       style={{ position: 'relative', zIndex: 10 }}
     >
       {/* Section heading */}
@@ -89,9 +89,9 @@ function ProductCard({
       </div>
 
       {/* Card content */}
-      <div className="p-5">
+      <div className="p-3 md:p-6">
         <h3
-          className="text-lg text-white font-light mb-1"
+          className="text-lg md:text-xl text-white font-light mb-1"
           style={{ fontFamily: 'var(--font-cormorant)' }}
         >
           {product.name}
@@ -102,11 +102,11 @@ function ProductCard({
         >
           {product.scale} · {product.notes} {dict.products.notes}
         </p>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <span className="text-[#C9A84C] text-sm font-medium">
             {product.price}
           </span>
-          <button className="text-xs tracking-[0.2em] text-white/50 hover:text-[#C9A84C] transition-colors uppercase border border-white/10 hover:border-[#C9A84C]/40 px-3 py-1.5 rounded-[2px]">
+          <button className="text-xs tracking-[0.2em] text-white/50 hover:text-[#C9A84C] transition-colors uppercase border border-white/10 hover:border-[#C9A84C]/40 px-3 py-1.5 rounded-[2px] self-start sm:self-auto">
             {dict.products.cta}
           </button>
         </div>

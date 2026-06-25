@@ -12,8 +12,8 @@ export default function ContactSection({
       {/* Gold divider */}
       <div className="h-px bg-gradient-to-r from-transparent via-[#C9A84C]/50 to-transparent" />
 
-      <div className="py-24 px-6 md:px-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16">
+      <div className="py-24 px-4 md:px-8 lg:px-16">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16">
           {/* Left: brand */}
           <div>
             <p
@@ -23,13 +23,13 @@ export default function ContactSection({
               {locale === 'fa' ? 'الیت هندپن' : 'Elite Handpan'}
             </p>
             <h2
-              className="text-4xl md:text-5xl font-light text-white leading-tight mb-6"
+              className="text-3xl md:text-5xl font-light text-white leading-tight mb-6"
               style={{ fontFamily: 'var(--font-cormorant)' }}
             >
               {dict.contact.heading}
             </h2>
             <p
-              className="text-[#888888] text-base max-w-xs leading-relaxed"
+              className="text-[#888888] text-sm md:text-base max-w-xs leading-relaxed"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
               {dict.contact.tagline}
@@ -63,7 +63,7 @@ export default function ContactSection({
       </div>
 
       {/* Footer bar */}
-      <div className="border-t border-white/5 py-6 px-6 md:px-16">
+      <div className="border-t border-white/5 py-6 px-4 md:px-8 lg:px-16">
         <p
           className="text-[#888888] text-xs text-center tracking-wider"
           style={{ fontFamily: 'var(--font-inter)' }}

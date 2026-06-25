@@ -243,13 +243,13 @@ export default function HeroSection({
             {dict.hero.eyebrow}
           </p>
           <h1
-            className="text-6xl md:text-8xl font-light text-white leading-tight"
+            className="text-4xl md:text-7xl font-light text-white leading-tight"
             style={{ fontFamily: 'var(--font-cormorant)' }}
           >
             {dict.hero.title}
           </h1>
           <p
-            className="text-[#888888] mt-6 text-lg md:text-xl max-w-md"
+            className="text-[#888888] mt-6 text-sm md:text-lg max-w-md"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             {dict.hero.subtitle}
@@ -259,7 +259,7 @@ export default function HeroSection({
         {/* Scroll hint */}
         <div
           ref={scrollHintRef}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+          className="hidden sm:flex absolute bottom-10 left-1/2 -translate-x-1/2 flex-col items-center gap-2"
         >
           <span
             className="text-white/40 text-[10px] tracking-[0.4em] uppercase"
