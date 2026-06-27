@@ -55,12 +55,12 @@ export default function Navbar({
         >
           {dict.nav.products}
         </a>
-        <a
-          href="#contact"
+        <Link
+          href={`/${locale}/contact`}
           className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
         >
           {dict.nav.contact}
-        </a>
+        </Link>
         <LanguageSwitcher locale={locale} />
       </div>
 
@@ -116,14 +116,14 @@ export default function Navbar({
           >
             {dict.nav.products}
           </a>
-          <a
-            href="#contact"
+          <Link
+            href={`/${locale}/contact`}
             onClick={closeMenu}
             className="text-white/90 hover:text-white text-2xl tracking-wider"
             style={{ fontFamily: 'var(--font-cormorant)' }}
           >
             {dict.nav.contact}
-          </a>
+          </Link>
 
           <div className="mt-4">
             <LanguageSwitcher locale={locale} />
