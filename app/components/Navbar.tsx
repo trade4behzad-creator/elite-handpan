@@ -38,12 +38,7 @@ export default function Navbar({
     >
       {/* Logo */}
       <Link href={`/${locale}`} className="flex items-center">
-        <span
-          className="text-[#C9A84C] tracking-[0.35em] text-sm font-semibold uppercase"
-          style={{ fontFamily: 'var(--font-inter)' }}
-        >
-          ELITE
-        </span>
+        <img src="/images/logo.png" alt="Elite Handpan" style={{ height: '40px', width: 'auto' }} />
       </Link>
 
       {/* Desktop nav links + switcher */}

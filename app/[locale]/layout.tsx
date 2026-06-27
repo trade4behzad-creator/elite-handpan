@@ -47,7 +47,7 @@ export default async function LocaleLayout({
       dir={dir}
       className={`${cormorant.variable} ${inter.variable} ${vazirmatn.variable}`}
     >
-      <body className="bg-[#080808] text-[#F5F5F5] antialiased overflow-x-hidden">
+      <body className="bg-white text-[#111111] antialiased overflow-x-hidden">
         {children}
       </body>
     </html>

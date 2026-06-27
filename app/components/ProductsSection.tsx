@@ -4,12 +4,12 @@ import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
 const products = [
-  { id: 1, name: 'Elite Solstice', scale: 'D Minor', notes: 9, price: '$1,400' },
-  { id: 2, name: 'Elite Aurora', scale: 'F# Major', notes: 8, price: '$1,250' },
-  { id: 3, name: 'Elite Eclipse', scale: 'C# Minor', notes: 10, price: '$1,600' },
-  { id: 4, name: 'Elite Zenith', scale: 'E Minor', notes: 9, price: '$1,350' },
-  { id: 5, name: 'Elite Nocturne', scale: 'A Minor', notes: 9, price: '$1,500' },
-  { id: 6, name: 'Elite Equinox', scale: 'G Major', notes: 8, price: '$1,200' },
+  { id: 1, name: 'Elite Solstice',  scale: 'D Minor',   notes: 9,  price: '$1,400' },
+  { id: 2, name: 'Elite Aurora',    scale: 'F# Major',  notes: 8,  price: '$1,250' },
+  { id: 3, name: 'Elite Eclipse',   scale: 'C# Minor',  notes: 10, price: '$1,600' },
+  { id: 4, name: 'Elite Zenith',    scale: 'E Minor',   notes: 9,  price: '$1,350' },
+  { id: 5, name: 'Elite Nocturne',  scale: 'A Minor',   notes: 9,  price: '$1,500' },
+  { id: 6, name: 'Elite Equinox',   scale: 'G Major',   notes: 8,  price: '$1,200' },
 ]
 
 export default function ProductsSection({
@@ -22,7 +22,7 @@ export default function ProductsSection({
   return (
     <section
       id="products"
-      className="bg-[#080808] py-28 px-4 md:px-8 lg:px-16"
+      className="bg-white py-28 px-4 md:px-8 lg:px-16"
       style={{ position: 'relative', zIndex: 10 }}
     >
       {/* Section heading */}
@@ -40,7 +40,7 @@ export default function ProductsSection({
           {locale === 'fa' ? 'کلکسیون' : 'Collection'}
         </p>
         <h2
-          className="text-5xl md:text-6xl font-light text-white"
+          className="text-5xl md:text-6xl font-light text-[#111111]"
           style={{ fontFamily: 'var(--font-cormorant)' }}
         >
           {dict.products.heading}
@@ -74,11 +74,11 @@ function ProductCard({
   dict: Dictionary
 }) {
   return (
-    <div className="group bg-[#111111] border border-white/5 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer">
+    <div className="group bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer">
       {/* Placeholder image */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #1a1a1a, #2a2a2a)',
+          background: 'linear-gradient(135deg, #f0f0f0, #e0e0e0)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -91,13 +91,13 @@ function ProductCard({
       {/* Card content */}
       <div className="p-3 md:p-6">
         <h3
-          className="text-lg md:text-xl text-white font-light mb-1"
+          className="text-lg md:text-xl text-[#111111] font-light mb-1"
           style={{ fontFamily: 'var(--font-cormorant)' }}
         >
           {product.name}
         </h3>
         <p
-          className="text-[#888888] text-xs tracking-wider mb-4"
+          className="text-gray-500 text-xs tracking-wider mb-4"
           style={{ fontFamily: 'var(--font-inter)' }}
         >
           {product.scale} · {product.notes} {dict.products.notes}
@@ -106,7 +106,7 @@ function ProductCard({
           <span className="text-[#C9A84C] text-sm font-medium">
             {product.price}
           </span>
-          <button className="text-xs tracking-[0.2em] text-white/50 hover:text-[#C9A84C] transition-colors uppercase border border-white/10 hover:border-[#C9A84C]/40 px-3 py-1.5 rounded-[2px] self-start sm:self-auto">
+          <button className="text-xs tracking-[0.2em] text-gray-400 hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px] self-start sm:self-auto">
             {dict.products.cta}
           </button>
         </div>
