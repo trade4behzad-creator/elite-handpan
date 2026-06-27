@@ -29,11 +29,22 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Invalid request body.' }, { status: 400 })
   }
 
-  const { name, email, phone, subject, message, website } = body
+  const { name, email, phone, subject, message, website, recaptchaToken } = body
 
   // Honeypot — silent accept so bots don't know they were blocked
   if (website) {
     return Response.json({ success: true })
+  }
+
+  // reCAPTCHA v3 verification
+  const verify = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+  })
+  const verifyData = await verify.json()
+  if (!verifyData.success || verifyData.score < 0.5) {
+    return Response.json({ error: 'Bot detected. Please try again.' }, { status: 400 })
   }
 
   // Validation

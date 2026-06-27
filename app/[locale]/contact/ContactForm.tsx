@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
@@ -16,6 +17,7 @@ const infoItems = [
 ]
 
 export default function ContactForm() {
+  const { executeRecaptcha } = useGoogleReCaptcha()
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [form, setForm] = useState({
@@ -36,11 +38,15 @@ export default function ContactForm() {
     const formData = new FormData(e.currentTarget)
     const payload = Object.fromEntries(formData.entries())
 
+    const recaptchaToken = executeRecaptcha
+      ? await executeRecaptcha('contact_form')
+      : ''
+
     try {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, recaptchaToken }),
       })
       const data = await res.json()
 
