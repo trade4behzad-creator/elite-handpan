@@ -114,6 +114,14 @@ export default function Navbar({
             {dict.nav.shop}
           </Link>
           <Link
+            href={`/${locale}/about`}
+            onClick={closeMenu}
+            className="text-white/90 hover:text-white text-2xl tracking-wider"
+            style={{ fontFamily: 'var(--font-cormorant)' }}
+          >
+            About
+          </Link>
+          <Link
             href={`/${locale}/contact`}
             onClick={closeMenu}
             className="text-white/90 hover:text-white text-2xl tracking-wider"
