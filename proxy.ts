@@ -7,6 +7,8 @@ const defaultLocale = 'en'
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  if (pathname.startsWith('/api/')) return NextResponse.next()
+
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
