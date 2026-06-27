@@ -4,7 +4,6 @@ import Navbar from '../components/Navbar'
 import HeroSection from '../components/HeroSection'
 import AboutSection from '../components/AboutSection'
 import ProductsSection from '../components/ProductsSection'
-import ContactSection from '../components/ContactSection'
 import Footer from '../components/Footer'
 
 export default async function LocalePage({
@@ -24,7 +23,6 @@ export default async function LocalePage({
       <HeroSection dict={dict} locale={locale} />
       <AboutSection locale={locale} />
       <ProductsSection dict={dict} locale={locale} />
-      <ContactSection dict={dict} locale={locale} />
       <Footer />
     </main>
   )

@@ -35,7 +35,7 @@ export default function Footer() {
   const instagramPlaceholders = Array.from({ length: 6 })
 
   return (
-    <footer className="relative bg-[#0d0d0d] text-white overflow-hidden">
+    <footer id="contact" className="relative bg-[#0d0d0d] text-white overflow-hidden">
       {/* Background image overlay */}
       <div className="absolute inset-0 z-0">
         <Image
