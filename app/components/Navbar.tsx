@@ -71,6 +71,11 @@ export default function Navbar({
           <LanguageSwitcher locale={locale} />
         </div>
 
+        {/* Mobile: language switcher always visible */}
+        <div className="md:hidden">
+          <LanguageSwitcher locale={locale} />
+        </div>
+
         {/* Mobile hamburger */}
         <button
           type="button"
@@ -93,31 +98,28 @@ export default function Navbar({
 
       {/* Mobile dropdown panel */}
       {menuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg z-50">
+        <div className="md:hidden absolute top-full left-0 right-0 bg-black shadow-lg z-50">
           <Link
             href={`/${locale}/shop`}
             onClick={closeMenu}
-            className="block text-gray-800 text-lg py-4 px-6 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            className="block text-white text-lg py-4 px-6 border-b border-gray-800 hover:bg-white/5 transition-colors"
           >
             Shop
           </Link>
           <Link
             href={`/${locale}/about`}
             onClick={closeMenu}
-            className="block text-gray-800 text-lg py-4 px-6 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            className="block text-white text-lg py-4 px-6 border-b border-gray-800 hover:bg-white/5 transition-colors"
           >
             About
           </Link>
           <Link
             href={`/${locale}/contact`}
             onClick={closeMenu}
-            className="block text-gray-800 text-lg py-4 px-6 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            className="block text-white text-lg py-4 px-6 hover:bg-white/5 transition-colors"
           >
             Contact
           </Link>
-          <div className="px-6 py-4">
-            <LanguageSwitcher locale={locale} />
-          </div>
         </div>
       )}
     </nav>
