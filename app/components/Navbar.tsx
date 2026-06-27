@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import type { Dictionary } from '../i18n'
 import LanguageSwitcher from './LanguageSwitcher'
 
@@ -14,6 +15,9 @@ export default function Navbar({
 }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const pathname = usePathname()
+
+  const isHomepage = pathname === `/${locale}` || pathname === `/${locale}/`
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60)
@@ -30,11 +34,18 @@ export default function Navbar({
 
   const closeMenu = () => setMenuOpen(false)
 
+  const navBg = isHomepage
+    ? scrolled || menuOpen
+      ? 'bg-black/80 backdrop-blur-md'
+      : 'bg-transparent'
+    : 'bg-black/90 backdrop-blur-md'
+
+  // Products link: anchor on homepage, full URL on interior pages
+  const productsHref = isHomepage ? '#products' : `/${locale}/#products`
+
   return (
     <nav
-      className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-4 md:px-8 lg:px-16 py-5 transition-all duration-500 ${
-        scrolled || menuOpen ? 'bg-black/80 backdrop-blur-md' : 'bg-transparent'
-      }`}
+      className={`fixed top-0 inset-x-0 z-50 flex items-center justify-between px-4 md:px-8 lg:px-16 py-5 transition-all duration-500 ${navBg}`}
     >
       {/* Logo */}
       <Link href={`/${locale}`} className="flex items-center">
@@ -50,7 +61,7 @@ export default function Navbar({
           {dict.nav.shop}
         </Link>
         <a
-          href="#products"
+          href={productsHref}
           className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
         >
           {dict.nav.products}
@@ -109,7 +120,7 @@ export default function Navbar({
             {dict.nav.shop}
           </Link>
           <a
-            href="#products"
+            href={productsHref}
             onClick={closeMenu}
             className="text-white/90 hover:text-white text-2xl tracking-wider"
             style={{ fontFamily: 'var(--font-cormorant)' }}
