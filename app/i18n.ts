@@ -1,5 +1,5 @@
 export type Dictionary = {
-  nav: { products: string; contact: string }
+  nav: { products: string; contact: string; shop: string }
   hero: { eyebrow: string; title: string; subtitle: string }
   products: { heading: string; notes: string; cta: string }
   contact: { heading: string; tagline: string }

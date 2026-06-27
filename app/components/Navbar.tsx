@@ -43,6 +43,12 @@ export default function Navbar({
 
       {/* Desktop nav links + switcher */}
       <div className="hidden md:flex items-center gap-8">
+        <Link
+          href={`/${locale}/shop`}
+          className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
+        >
+          {dict.nav.shop}
+        </Link>
         <a
           href="#products"
           className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
@@ -94,6 +100,14 @@ export default function Navbar({
             </svg>
           </button>
 
+          <Link
+            href={`/${locale}/shop`}
+            onClick={closeMenu}
+            className="text-white/90 hover:text-white text-2xl tracking-wider"
+            style={{ fontFamily: 'var(--font-cormorant)' }}
+          >
+            {dict.nav.shop}
+          </Link>
           <a
             href="#products"
             onClick={closeMenu}
