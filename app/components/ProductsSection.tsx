@@ -1,15 +1,16 @@
 'use client'
 
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
 const products = [
-  { id: 1, name: 'Elite Solstice',  scale: 'D Minor',   notes: 9,  price: '$1,400', image: '/images/portfolio/p1.jpg' },
-  { id: 2, name: 'Elite Aurora',    scale: 'F# Major',  notes: 8,  price: '$1,250', image: '/images/portfolio/p2.jpg' },
-  { id: 3, name: 'Elite Eclipse',   scale: 'C# Minor',  notes: 10, price: '$1,600', image: '/images/portfolio/p3.jpg' },
-  { id: 4, name: 'Elite Zenith',    scale: 'E Minor',   notes: 9,  price: '$1,350', image: '/images/portfolio/p4.jpg' },
-  { id: 5, name: 'Elite Nocturne',  scale: 'A Minor',   notes: 9,  price: '$1,500', image: '/images/portfolio/p5.jpg' },
-  { id: 6, name: 'Elite Equinox',   scale: 'G Major',   notes: 8,  price: '$1,200', image: '/images/portfolio/p6.jpg' },
+  { id: 1, slug: 'elite-solstice', name: 'Elite Solstice', scale: 'D Minor',  notes: 9,  price: '$1,400', image: '/images/portfolio/p1.jpg' },
+  { id: 2, slug: 'elite-aurora',   name: 'Elite Aurora',   scale: 'F# Major', notes: 8,  price: '$1,250', image: '/images/portfolio/p2.jpg' },
+  { id: 3, slug: 'elite-eclipse',  name: 'Elite Eclipse',  scale: 'C# Minor', notes: 10, price: '$1,600', image: '/images/portfolio/p3.jpg' },
+  { id: 4, slug: 'elite-zenith',   name: 'Elite Zenith',   scale: 'E Minor',  notes: 9,  price: '$1,350', image: '/images/portfolio/p4.jpg' },
+  { id: 5, slug: 'elite-nocturne', name: 'Elite Nocturne', scale: 'A Minor',  notes: 9,  price: '$1,500', image: '/images/portfolio/p5.jpg' },
+  { id: 6, slug: 'elite-equinox',  name: 'Elite Equinox',  scale: 'G Major',  notes: 8,  price: '$1,200', image: '/images/portfolio/p6.jpg' },
 ]
 
 export default function ProductsSection({
@@ -59,7 +60,9 @@ export default function ProductsSection({
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.6, delay: index * 0.1, ease: 'easeOut' }}
           >
-            <ProductCard product={product} dict={dict} />
+            <Link href={`/${locale}/shop/handpan/${product.slug}`}>
+              <ProductCard product={product} dict={dict} />
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -100,13 +103,13 @@ function ProductCard({
         >
           {product.scale} · {product.notes} {dict.products.notes}
         </p>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between">
           <span className="text-[#C9A84C] text-sm font-medium">
             {product.price}
           </span>
-          <button className="text-xs tracking-[0.2em] text-gray-400 hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px] self-start sm:self-auto">
+          <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 group-hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px]">
             {dict.products.cta}
-          </button>
+          </span>
         </div>
       </div>
     </div>

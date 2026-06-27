@@ -1,12 +1,13 @@
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { getDictionary, hasLocale } from '../../../i18n'
 import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
 
 const products = [
-  { id: 1, name: 'Elite Case Pro',  description: 'Hard protective case',       price: '$120', image: '/images/shop/accessories/a1.jpg' },
-  { id: 2, name: 'Elite Soft Bag',  description: 'Lightweight carry bag',       price: '$80',  image: '/images/shop/accessories/a2.jpg' },
-  { id: 3, name: 'Elite Stand',     description: 'Foldable instrument stand',   price: '$65',  image: '/images/shop/accessories/a3.jpg' },
+  { id: 1, slug: 'elite-case-pro', name: 'Elite Case Pro', description: 'Hard protective case',     price: '$120', image: '/images/shop/accessories/a1.jpg' },
+  { id: 2, slug: 'elite-soft-bag', name: 'Elite Soft Bag', description: 'Lightweight carry bag',     price: '$80',  image: '/images/shop/accessories/a2.jpg' },
+  { id: 3, slug: 'elite-stand',    name: 'Elite Stand',    description: 'Foldable instrument stand', price: '$65',  image: '/images/shop/accessories/a3.jpg' },
 ]
 
 export default async function ShopAccessoryPage({
@@ -44,9 +45,10 @@ export default async function ShopAccessoryPage({
           {/* Product grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product) => (
-              <div
+              <Link
                 key={product.id}
-                className="group bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer p-6"
+                href={`/${locale}/shop/accessory/${product.slug}`}
+                className="group block bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden p-6"
               >
                 <div className="aspect-square bg-[#f5f5f5] flex items-center justify-center rounded-sm overflow-hidden mb-5 p-4">
                   <img
@@ -67,15 +69,15 @@ export default async function ShopAccessoryPage({
                 >
                   {product.description}
                 </p>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center justify-between">
                   <span className="text-[#C9A84C] text-sm font-medium">
                     {product.price}
                   </span>
-                  <button className="text-xs tracking-[0.2em] text-gray-400 hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px] self-start sm:self-auto">
+                  <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 group-hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px]">
                     {dict.products.cta}
-                  </button>
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
