@@ -1,6 +1,7 @@
 'use client'
 
-import { useRef, useState, useTransition } from 'react'
+import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
 import { createProduct } from '../actions'
 
 const GOLD = '#C9A84C'
@@ -39,9 +40,32 @@ function slugify(str: string) {
     .replace(/-+/g, '-')
 }
 
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      style={{
+        padding: '12px 28px',
+        background: pending ? '#8a7033' : GOLD,
+        border: 'none',
+        borderRadius: '4px',
+        color: '#0a0a0a',
+        fontSize: '14px',
+        fontWeight: '600',
+        cursor: pending ? 'not-allowed' : 'pointer',
+        fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+        transition: 'background 0.2s',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {pending ? 'در حال ذخیره...' : 'ذخیره محصول'}
+    </button>
+  )
+}
+
 export default function NewProductPage() {
-  const formRef = useRef<HTMLFormElement>(null)
-  const [isPending, startTransition] = useTransition()
   const [slug, setSlug] = useState('')
   const [inStock, setInStock] = useState(true)
   const [previews, setPreviews] = useState<string[]>([])
@@ -55,16 +79,6 @@ export default function NewProductPage() {
     setPreviews(files.map((f) => URL.createObjectURL(f)))
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const form = formRef.current!
-    const data = new FormData(form)
-    data.set('in_stock', String(inStock))
-    startTransition(() => {
-      createProduct(data)
-    })
-  }
-
   return (
     <div>
       <div style={{ marginBottom: '40px' }}>
@@ -75,7 +89,10 @@ export default function NewProductPage() {
         <div style={{ width: '40px', height: '1px', background: GOLD, marginTop: '16px', opacity: 0.5 }} />
       </div>
 
-      <form ref={formRef} onSubmit={handleSubmit}>
+      <form action={createProduct}>
+        {/* Hidden in_stock field — updated by the toggle button */}
+        <input type="hidden" name="in_stock" value={String(inStock)} />
+
         <div
           style={{
             background: '#111',
@@ -126,11 +143,27 @@ export default function NewProductPage() {
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>تعداد نت</label>
-              <input name="notes" type="number" required min={1} max={20} placeholder="9" style={{ ...inputStyle, direction: 'ltr' }} />
+              <input
+                name="notes"
+                type="number"
+                required
+                min={1}
+                max={20}
+                placeholder="9"
+                style={{ ...inputStyle, direction: 'ltr' }}
+              />
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>قیمت (دلار)</label>
-              <input name="price" type="number" required min={0} step="0.01" placeholder="1400" style={{ ...inputStyle, direction: 'ltr' }} />
+              <input
+                name="price"
+                type="number"
+                required
+                min={0}
+                step="0.01"
+                placeholder="1400"
+                style={{ ...inputStyle, direction: 'ltr' }}
+              />
             </div>
           </div>
 
@@ -168,10 +201,11 @@ export default function NewProductPage() {
 
           {/* In stock toggle */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <label style={{ ...labelStyle, margin: 0 }}>موجودی</label>
+            <span style={labelStyle}>موجودی</span>
             <button
               type="button"
               onClick={() => setInStock((v) => !v)}
+              aria-label="تغییر وضعیت موجودی"
               style={{
                 position: 'relative',
                 width: '52px',
@@ -194,6 +228,7 @@ export default function NewProductPage() {
                   borderRadius: '50%',
                   background: '#fff',
                   transition: 'right 0.2s',
+                  display: 'block',
                 }}
               />
             </button>
@@ -275,24 +310,7 @@ export default function NewProductPage() {
             >
               انصراف
             </a>
-            <button
-              type="submit"
-              disabled={isPending}
-              style={{
-                padding: '12px 28px',
-                background: isPending ? '#8a7033' : GOLD,
-                border: 'none',
-                borderRadius: '4px',
-                color: '#0a0a0a',
-                fontSize: '14px',
-                fontWeight: '600',
-                cursor: isPending ? 'not-allowed' : 'pointer',
-                fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
-                transition: 'background 0.2s',
-              }}
-            >
-              {isPending ? 'در حال ذخیره...' : 'ذخیره محصول'}
-            </button>
+            <SubmitButton />
           </div>
         </div>
       </form>

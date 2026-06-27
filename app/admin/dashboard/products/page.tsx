@@ -10,7 +10,6 @@ type Product = {
   price: number
   in_stock: boolean
   slug: string
-  product_images?: { url: string }[]
 }
 
 async function deleteProduct(formData: FormData) {
@@ -29,17 +28,24 @@ async function toggleStock(formData: FormData) {
   revalidatePath('/admin/dashboard/products')
 }
 
-export default async function ProductsPage() {
-  const { data: products } = await supabaseAdmin
-    .from('products')
-    .select('id, name_en, name_fa, scale, price, in_stock, slug, product_images(url)')
-    .order('created_at', { ascending: false })
+const GOLD = '#C9A84C'
 
-  const GOLD = '#C9A84C'
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string }>
+}) {
+  const { success } = await searchParams
+
+  const { data: products, error } = await supabaseAdmin
+    .from('products')
+    .select('id, name_en, name_fa, scale, price, in_stock, slug')
+    .order('created_at', { ascending: false })
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '40px' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '32px' }}>
         <div>
           <p style={{ color: GOLD, fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '8px' }}>
             مدیریت
@@ -63,26 +69,82 @@ export default async function ProductsPage() {
         </Link>
       </div>
 
-      {(!products || products.length === 0) ? (
+      {/* Success banner */}
+      {success === '1' && (
+        <div
+          style={{
+            background: 'rgba(34,197,94,0.08)',
+            border: '1px solid rgba(34,197,94,0.25)',
+            borderRadius: '6px',
+            padding: '14px 20px',
+            marginBottom: '24px',
+            color: '#4ade80',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          <span>✓</span>
+          محصول با موفقیت ذخیره شد
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div
+          style={{
+            background: 'rgba(239,68,68,0.08)',
+            border: '1px solid rgba(239,68,68,0.25)',
+            borderRadius: '6px',
+            padding: '14px 20px',
+            marginBottom: '24px',
+            color: '#f87171',
+            fontSize: '14px',
+          }}
+        >
+          خطا در دریافت اطلاعات: {error.message}
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!error && (!products || products.length === 0) && (
         <div
           style={{
             background: '#111',
             border: '1px solid #1e1e1e',
             borderRadius: '8px',
-            padding: '48px',
+            padding: '56px 48px',
             textAlign: 'center',
             color: '#555',
           }}
         >
-          <p style={{ fontSize: '16px', marginBottom: '8px' }}>هیچ محصولی یافت نشد</p>
-          <p style={{ fontSize: '13px' }}>اولین محصول خود را اضافه کنید</p>
+          <p style={{ fontSize: '16px', marginBottom: '8px', color: '#666' }}>هیچ محصولی یافت نشد</p>
+          <p style={{ fontSize: '13px', marginBottom: '24px' }}>اولین محصول خود را اضافه کنید</p>
+          <Link
+            href="/admin/dashboard/products/new"
+            style={{
+              padding: '10px 24px',
+              background: GOLD,
+              color: '#0a0a0a',
+              borderRadius: '4px',
+              fontSize: '13px',
+              fontWeight: '600',
+              textDecoration: 'none',
+            }}
+          >
+            + افزودن محصول جدید
+          </Link>
         </div>
-      ) : (
+      )}
+
+      {/* Products table */}
+      {products && products.length > 0 && (
         <div style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: '8px', overflow: 'hidden' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #1e1e1e' }}>
-                {['تصویر', 'نام', 'گام', 'قیمت', 'موجودی', 'عملیات'].map((h) => (
+                {['نام انگلیسی', 'نام فارسی', 'گام', 'قیمت', 'موجودی', 'عملیات'].map((h) => (
                   <th
                     key={h}
                     style={{
@@ -91,7 +153,8 @@ export default async function ProductsPage() {
                       color: '#555',
                       fontWeight: '400',
                       textAlign: 'right',
-                      letterSpacing: '0.05em',
+                      letterSpacing: '0.04em',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {h}
@@ -100,116 +163,105 @@ export default async function ProductsPage() {
               </tr>
             </thead>
             <tbody>
-              {(products as Product[]).map((product, i) => {
-                const img = product.product_images?.[0]?.url
-                return (
-                  <tr
-                    key={product.id}
-                    style={{
-                      borderBottom: i < products.length - 1 ? '1px solid #161616' : 'none',
-                    }}
-                  >
-                    {/* Image */}
-                    <td style={{ padding: '12px 20px' }}>
-                      <div
+              {(products as Product[]).map((product, i) => (
+                <tr
+                  key={product.id}
+                  style={{
+                    borderBottom: i < products.length - 1 ? '1px solid #161616' : 'none',
+                    transition: 'background 0.1s',
+                  }}
+                >
+                  {/* Name EN */}
+                  <td style={{ padding: '14px 20px' }}>
+                    <span style={{ color: '#aaa', fontSize: '14px', direction: 'ltr', display: 'block' }}>
+                      {product.name_en}
+                    </span>
+                    <span style={{ color: '#444', fontSize: '11px', direction: 'ltr', display: 'block', marginTop: '2px' }}>
+                      /{product.slug}
+                    </span>
+                  </td>
+
+                  {/* Name FA */}
+                  <td style={{ padding: '14px 20px', color: '#f5f5f5', fontSize: '14px' }}>
+                    {product.name_fa || '—'}
+                  </td>
+
+                  {/* Scale */}
+                  <td style={{ padding: '14px 20px', color: '#888', fontSize: '13px', direction: 'ltr', whiteSpace: 'nowrap' }}>
+                    {product.scale}
+                  </td>
+
+                  {/* Price */}
+                  <td style={{ padding: '14px 20px', color: GOLD, fontSize: '14px', direction: 'ltr', whiteSpace: 'nowrap' }}>
+                    ${Number(product.price).toLocaleString()}
+                  </td>
+
+                  {/* Stock toggle */}
+                  <td style={{ padding: '14px 20px' }}>
+                    <form action={toggleStock}>
+                      <input type="hidden" name="id" value={product.id} />
+                      <input type="hidden" name="in_stock" value={String(product.in_stock)} />
+                      <button
+                        type="submit"
+                        title="کلیک کنید برای تغییر"
                         style={{
-                          width: '48px',
-                          height: '48px',
-                          background: '#1a1a1a',
-                          borderRadius: '4px',
-                          overflow: 'hidden',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          padding: '4px 14px',
+                          background: product.in_stock ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
+                          border: `1px solid ${product.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+                          borderRadius: '12px',
+                          color: product.in_stock ? '#4ade80' : '#f87171',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+                          whiteSpace: 'nowrap',
                         }}
                       >
-                        {img ? (
-                          <img src={img} alt={product.name_en} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                        ) : (
-                          <span style={{ color: '#333', fontSize: '18px' }}>◎</span>
-                        )}
-                      </div>
-                    </td>
+                        {product.in_stock ? 'موجود' : 'ناموجود'}
+                      </button>
+                    </form>
+                  </td>
 
-                    {/* Name */}
-                    <td style={{ padding: '12px 20px' }}>
-                      <p style={{ color: '#f5f5f5', fontSize: '14px', margin: '0 0 2px' }}>{product.name_fa || product.name_en}</p>
-                      <p style={{ color: '#555', fontSize: '12px', margin: 0, direction: 'ltr' }}>{product.name_en}</p>
-                    </td>
-
-                    {/* Scale */}
-                    <td style={{ padding: '12px 20px', color: '#888', fontSize: '13px', direction: 'ltr' }}>
-                      {product.scale}
-                    </td>
-
-                    {/* Price */}
-                    <td style={{ padding: '12px 20px', color: GOLD, fontSize: '14px', direction: 'ltr' }}>
-                      ${product.price?.toLocaleString()}
-                    </td>
-
-                    {/* Stock toggle */}
-                    <td style={{ padding: '12px 20px' }}>
-                      <form action={toggleStock}>
+                  {/* Actions */}
+                  <td style={{ padding: '14px 20px' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <Link
+                        href={`/admin/dashboard/products/edit/${product.id}`}
+                        style={{
+                          padding: '6px 14px',
+                          background: 'transparent',
+                          border: `1px solid ${GOLD}50`,
+                          borderRadius: '4px',
+                          color: GOLD,
+                          fontSize: '12px',
+                          textDecoration: 'none',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        ویرایش
+                      </Link>
+                      <form action={deleteProduct}>
                         <input type="hidden" name="id" value={product.id} />
-                        <input type="hidden" name="in_stock" value={String(product.in_stock)} />
                         <button
                           type="submit"
                           style={{
-                            padding: '4px 12px',
-                            background: product.in_stock ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                            border: `1px solid ${product.in_stock ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
-                            borderRadius: '12px',
-                            color: product.in_stock ? '#4ade80' : '#f87171',
+                            padding: '6px 14px',
+                            background: 'transparent',
+                            border: '1px solid rgba(239,68,68,0.3)',
+                            borderRadius: '4px',
+                            color: '#f87171',
                             fontSize: '12px',
                             cursor: 'pointer',
                             fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+                            whiteSpace: 'nowrap',
                           }}
                         >
-                          {product.in_stock ? 'موجود' : 'ناموجود'}
+                          حذف
                         </button>
                       </form>
-                    </td>
-
-                    {/* Actions */}
-                    <td style={{ padding: '12px 20px' }}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <Link
-                          href={`/admin/dashboard/products/${product.id}/edit`}
-                          style={{
-                            padding: '6px 14px',
-                            background: 'transparent',
-                            border: `1px solid ${GOLD}40`,
-                            borderRadius: '4px',
-                            color: GOLD,
-                            fontSize: '12px',
-                            textDecoration: 'none',
-                          }}
-                        >
-                          ویرایش
-                        </Link>
-                        <form action={deleteProduct}>
-                          <input type="hidden" name="id" value={product.id} />
-                          <button
-                            type="submit"
-                            style={{
-                              padding: '6px 14px',
-                              background: 'transparent',
-                              border: '1px solid rgba(239,68,68,0.3)',
-                              borderRadius: '4px',
-                              color: '#f87171',
-                              fontSize: '12px',
-                              cursor: 'pointer',
-                              fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
-                            }}
-                          >
-                            حذف
-                          </button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

@@ -50,5 +50,5 @@ export async function createProduct(formData: FormData) {
     }
   }
 
-  redirect('/admin/dashboard/products')
+  redirect('/admin/dashboard/products?success=1')
 }
