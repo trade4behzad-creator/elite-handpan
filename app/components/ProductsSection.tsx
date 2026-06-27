@@ -4,12 +4,12 @@ import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
 const products = [
-  { id: 1, name: 'Elite Solstice',  scale: 'D Minor',   notes: 9,  price: '$1,400' },
-  { id: 2, name: 'Elite Aurora',    scale: 'F# Major',  notes: 8,  price: '$1,250' },
-  { id: 3, name: 'Elite Eclipse',   scale: 'C# Minor',  notes: 10, price: '$1,600' },
-  { id: 4, name: 'Elite Zenith',    scale: 'E Minor',   notes: 9,  price: '$1,350' },
-  { id: 5, name: 'Elite Nocturne',  scale: 'A Minor',   notes: 9,  price: '$1,500' },
-  { id: 6, name: 'Elite Equinox',   scale: 'G Major',   notes: 8,  price: '$1,200' },
+  { id: 1, name: 'Elite Solstice',  scale: 'D Minor',   notes: 9,  price: '$1,400', image: '/images/portfolio/p1.jpg' },
+  { id: 2, name: 'Elite Aurora',    scale: 'F# Major',  notes: 8,  price: '$1,250', image: '/images/portfolio/p2.jpg' },
+  { id: 3, name: 'Elite Eclipse',   scale: 'C# Minor',  notes: 10, price: '$1,600', image: '/images/portfolio/p3.jpg' },
+  { id: 4, name: 'Elite Zenith',    scale: 'E Minor',   notes: 9,  price: '$1,350', image: '/images/portfolio/p4.jpg' },
+  { id: 5, name: 'Elite Nocturne',  scale: 'A Minor',   notes: 9,  price: '$1,500', image: '/images/portfolio/p5.jpg' },
+  { id: 6, name: 'Elite Equinox',   scale: 'G Major',   notes: 8,  price: '$1,200', image: '/images/portfolio/p6.jpg' },
 ]
 
 export default function ProductsSection({
@@ -75,23 +75,19 @@ function ProductCard({
 }) {
   return (
     <div className="group bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer">
-      {/* Placeholder image */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #f0f0f0, #e0e0e0)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          aspectRatio: '1',
-        }}
-      >
-        <span style={{ color: '#C9A84C', fontSize: '40px' }}>◉</span>
+      {/* Real image */}
+      <div className="aspect-square overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Card content */}
       <div className="p-3 md:p-6">
         <h3
-          className="text-lg md:text-xl text-[#111111] font-light mb-1"
+          className="text-lg md:text-xl text-[#111111] font-semibold mb-1"
           style={{ fontFamily: 'var(--font-cormorant)' }}
         >
           {product.name}
