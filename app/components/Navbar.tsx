@@ -54,21 +54,13 @@ export default function Navbar({
         <div className="md:hidden fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center gap-8">
           <button type="button" onClick={closeMenu} aria-label="Close menu" className="absolute top-5 right-4 text-white p-2">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-              <path d="M3 3l16 16M19 3L3 19" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <path d="M3 3l16 16M19 3L3 19" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
             </svg>
           </button>
-          <Link href={`/${locale}/shop`} onClick={closeMenu} className="text-white text-2xl tracking-wider" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            {dict.nav.shop}
-          </Link>
-          <Link href={`/${locale}/about`} onClick={closeMenu} className="text-white text-2xl tracking-wider" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            About
-          </Link>
-          <Link href={`/${locale}/contact`} onClick={closeMenu} className="text-white text-2xl tracking-wider" style={{ fontFamily: 'var(--font-cormorant)' }}>
-            {dict.nav.contact}
-          </Link>
-          <div className="mt-4">
-            <LanguageSwitcher locale={locale} />
-          </div>
+          <Link href={`/${locale}/shop`} onClick={closeMenu} className="text-white text-2xl tracking-wider font-light">Shop</Link>
+          <Link href={`/${locale}/about`} onClick={closeMenu} className="text-white text-2xl tracking-wider font-light">About</Link>
+          <Link href={`/${locale}/contact`} onClick={closeMenu} className="text-white text-2xl tracking-wider font-light">Contact</Link>
+          <div className="mt-4"><LanguageSwitcher locale={locale} /></div>
         </div>
       )}
     </nav>
