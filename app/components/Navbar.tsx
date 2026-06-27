@@ -65,7 +65,7 @@ export default function Navbar({
       <div className="flex items-center justify-between px-4 md:px-8 lg:px-16 py-5">
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center">
-          <img src="/images/logo.png" alt="Elite Handpan" style={{ height: '40px', width: 'auto' }} />
+          <img src="/images/logo.png" alt="Elite Handpan" style={{ height: '100px', width: 'auto' }} />
         </Link>
 
         {/* Desktop nav */}
