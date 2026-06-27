@@ -60,12 +60,6 @@ export default function Navbar({
         >
           {dict.nav.shop}
         </Link>
-        <a
-          href={productsHref}
-          className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
-        >
-          {dict.nav.products}
-        </a>
         <Link
           href={`/${locale}/contact`}
           className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
@@ -119,14 +113,6 @@ export default function Navbar({
           >
             {dict.nav.shop}
           </Link>
-          <a
-            href={productsHref}
-            onClick={closeMenu}
-            className="text-white/90 hover:text-white text-2xl tracking-wider"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            {dict.nav.products}
-          </a>
           <Link
             href={`/${locale}/contact`}
             onClick={closeMenu}
