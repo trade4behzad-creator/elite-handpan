@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
 const TOTAL_FRAMES = 336
+const BATCH_SIZE = 20
 
 function drawCover(
   ctx: CanvasRenderingContext2D,
@@ -56,6 +57,10 @@ export default function HeroSection({
   const [loadProgress, setLoadProgress] = useState(0)
   const [allLoaded, setAllLoaded] = useState(false)
 
+  const targetFrameRef = useRef(0)
+  const currentFrameRef = useRef(0)
+  const rafRef = useRef<number | null>(null)
+
   const drawFrame = useCallback((index: number) => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -66,60 +71,65 @@ export default function HeroSection({
     drawCover(ctx, img, canvas.width, canvas.height)
   }, [])
 
-  // Scroll listener — drives all visual state via direct DOM mutation
+  // rAF loop lerps currentFrame → targetFrame and renders; scroll handler only sets targetFrame
   useEffect(() => {
     const section = sectionRef.current
     const canvas = canvasRef.current
     const overlay = overlayRef.current
     if (!section || !canvas || !overlay) return
 
+    const tick = () => {
+      const target = targetFrameRef.current
+      const current = currentFrameRef.current
+      const diff = target - current
+      if (Math.abs(diff) > 0.5) {
+        currentFrameRef.current = current + diff * 0.08
+        drawFrame(Math.round(currentFrameRef.current))
+      }
+      rafRef.current = requestAnimationFrame(tick)
+    }
+    rafRef.current = requestAnimationFrame(tick)
+
     const handleScroll = () => {
       const sectionTop = section.offsetTop
-      const sectionHeight = section.offsetHeight   // 400vh
+      const sectionHeight = section.offsetHeight
       const vh = window.innerHeight
       const scrollY = window.scrollY
-
-      // The animation runs while canvas is fixed: sectionTop → switchPoint
-      // switchPoint = when the viewport bottom meets the section bottom
       const switchPoint = sectionTop + sectionHeight - vh
 
       if (scrollY >= switchPoint) {
-        // Animation done: freeze canvas at absolute bottom of hero so it
-        // naturally scrolls off as the section exits the viewport
         pinAbsolute(canvas)
         pinAbsolute(overlay)
-        drawFrame(TOTAL_FRAMES - 1)
+        targetFrameRef.current = TOTAL_FRAMES - 1
         return
       }
 
-      // In animation range: keep canvas pinned to viewport
       pinFixed(canvas)
       pinFixed(overlay)
 
       const progress = Math.max(0, (scrollY - sectionTop) / (switchPoint - sectionTop))
 
-      // Text fades out between 0–30%
       if (textRef.current) {
         textRef.current.style.opacity = String(Math.max(0, 1 - progress / 0.3))
       }
-
-      // Golden rule slides in between 45–72%
       if (lineRef.current) {
         const lp = Math.max(0, Math.min(1, (progress - 0.45) / 0.27))
         lineRef.current.style.transform = `scaleX(${lp})`
       }
-
-      // Scroll hint fades by 5%
       if (scrollHintRef.current) {
         scrollHintRef.current.style.opacity = String(Math.max(0, 1 - progress / 0.05))
       }
 
-      drawFrame(Math.min(Math.floor(progress * TOTAL_FRAMES), TOTAL_FRAMES - 1))
+      targetFrameRef.current = Math.min(Math.floor(progress * TOTAL_FRAMES), TOTAL_FRAMES - 1)
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll() // sync state on mount
-    return () => window.removeEventListener('scroll', handleScroll)
+    handleScroll()
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current)
+    }
   }, [drawFrame])
 
   // Preload frames + resize
@@ -154,20 +164,30 @@ export default function HeroSection({
     framesRef.current = frames
     let loaded = 0
 
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
-      const img = new Image()
-      img.src = `/frames/frame_${String(i + 1).padStart(4, '0')}.jpg`
-      frames[i] = img
-      const fi = i
-      const done = () => {
-        loaded++
-        if (fi === 0) drawFrame(0)
-        if (loaded % 20 === 0 || loaded === TOTAL_FRAMES) setLoadProgress(loaded / TOTAL_FRAMES)
-        if (loaded === TOTAL_FRAMES) setAllLoaded(true)
+    function loadBatch(start: number) {
+      const end = Math.min(start + BATCH_SIZE, TOTAL_FRAMES)
+      let batchDone = 0
+      const batchTotal = end - start
+
+      for (let i = start; i < end; i++) {
+        const img = new Image()
+        img.src = `/frames/frame_${String(i + 1).padStart(4, '0')}.jpg`
+        frames[i] = img
+
+        const done = () => {
+          loaded++
+          batchDone++
+          if (i === 0) drawFrame(0)
+          if (loaded % 20 === 0 || loaded === TOTAL_FRAMES) setLoadProgress(loaded / TOTAL_FRAMES)
+          if (loaded === TOTAL_FRAMES) setAllLoaded(true)
+          if (batchDone === batchTotal && end < TOTAL_FRAMES) loadBatch(end)
+        }
+        img.onload = done
+        img.onerror = done
       }
-      img.onload = done
-      img.onerror = done
     }
+
+    loadBatch(0)
 
     return () => window.removeEventListener('resize', handleResize)
   }, [drawFrame])
@@ -189,6 +209,7 @@ export default function HeroSection({
           width: '100vw',
           height: '100vh',
           zIndex: 0,
+          willChange: 'transform',
         }}
       />
 
