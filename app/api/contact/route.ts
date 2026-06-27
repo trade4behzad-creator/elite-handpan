@@ -58,16 +58,10 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const to = process.env.EMAIL_TO
-  if (!to) {
-    console.error('EMAIL_TO env variable is not set')
-    return Response.json({ error: 'Server configuration error.' }, { status: 500 })
-  }
-
   try {
     await resend.emails.send({
       from: 'Elite Handpan <onboarding@resend.dev>',
-      to,
+      to: 'trade4behzad@gmail.com',
       subject: `[Elite Handpan] ${subject} — from ${name}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
