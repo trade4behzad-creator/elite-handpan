@@ -22,9 +22,10 @@ export default function ProductsSection({
   return (
     <section
       id="products"
-      className="bg-white py-28 px-4 md:px-8 lg:px-16"
+      className="bg-white py-28 px-8"
       style={{ position: 'relative', zIndex: 10 }}
     >
+      <div className="max-w-6xl mx-auto">
       {/* Section heading */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -62,6 +63,7 @@ export default function ProductsSection({
           </motion.div>
         ))}
       </div>
+      </div>
     </section>
   )
 }
@@ -74,18 +76,18 @@ function ProductCard({
   dict: Dictionary
 }) {
   return (
-    <div className="group bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer">
-      {/* Real image */}
-      <div className="aspect-square overflow-hidden">
+    <div className="group bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer p-6">
+      {/* Image */}
+      <div className="aspect-square bg-[#f8f8f8] flex items-center justify-center rounded-sm overflow-hidden mb-5">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain"
         />
       </div>
 
       {/* Card content */}
-      <div className="p-3 md:p-6">
+      <div>
         <h3
           className="text-lg md:text-xl text-[#111111] font-semibold mb-1"
           style={{ fontFamily: 'var(--font-cormorant)' }}
