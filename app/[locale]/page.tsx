@@ -5,6 +5,7 @@ import HeroSection from '../components/HeroSection'
 import AboutSection from '../components/AboutSection'
 import ProductsSection from '../components/ProductsSection'
 import ContactSection from '../components/ContactSection'
+import Footer from '../components/Footer'
 
 export default async function LocalePage({
   params,
@@ -24,6 +25,7 @@ export default async function LocalePage({
       <AboutSection locale={locale} />
       <ProductsSection dict={dict} locale={locale} />
       <ContactSection dict={dict} locale={locale} />
+      <Footer />
     </main>
   )
 }
