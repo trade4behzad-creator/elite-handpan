@@ -61,6 +61,12 @@ export default function Navbar({
           {dict.nav.shop}
         </Link>
         <Link
+          href={`/${locale}/about`}
+          className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
+        >
+          About
+        </Link>
+        <Link
           href={`/${locale}/contact`}
           className="text-white/70 hover:text-white text-sm tracking-wider transition-colors"
         >
