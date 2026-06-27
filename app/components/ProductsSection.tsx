@@ -22,7 +22,7 @@ export default function ProductsSection({
   return (
     <section
       id="products"
-      className="bg-white py-28 px-8"
+      className="bg-white py-20 px-8"
       style={{ position: 'relative', zIndex: 10 }}
     >
       <div className="max-w-6xl mx-auto">
@@ -78,11 +78,11 @@ function ProductCard({
   return (
     <div className="group bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden cursor-pointer p-6">
       {/* Image */}
-      <div className="aspect-square bg-[#f8f8f8] flex items-center justify-center rounded-sm overflow-hidden mb-5">
+      <div className="aspect-square bg-[#f5f5f5] flex items-center justify-center rounded-sm overflow-hidden mb-5 p-4">
         <img
           src={product.image}
           alt={product.name}
-          className="w-full h-full object-contain"
+          className="w-full h-full object-contain mix-blend-multiply"
         />
       </div>
 
