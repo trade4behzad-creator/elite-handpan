@@ -9,6 +9,17 @@ export function proxy(request: NextRequest) {
 
   if (pathname.startsWith('/api/')) return NextResponse.next()
 
+  // Admin routes: skip locale redirect, protect dashboard behind cookie
+  if (pathname.startsWith('/admin')) {
+    if (pathname.startsWith('/admin/dashboard')) {
+      const adminAuth = request.cookies.get('admin_auth')
+      if (!adminAuth || adminAuth.value !== 'true') {
+        return NextResponse.redirect(new URL('/admin', request.url))
+      }
+    }
+    return NextResponse.next()
+  }
+
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   )
