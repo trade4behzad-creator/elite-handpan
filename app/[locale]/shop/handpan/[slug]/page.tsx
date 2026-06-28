@@ -15,7 +15,7 @@ export default async function ProductPage({
 
   const { data: product } = await supabaseAdmin
     .from('products')
-    .select('id, name_en, name_fa, slug, scale, notes, price, description_en, description_fa, note_arrangement, in_stock')
+    .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, description_en, description_fa, note_arrangement, in_stock')
     .eq('slug', slug)
     .single()
 
@@ -25,7 +25,7 @@ export default async function ProductPage({
     .from('product_images')
     .select('url')
     .eq('product_id', product.id)
-    .order('order', { ascending: true })
+    .order('sort_order', { ascending: true })
 
   const images = imageRows?.map((r) => r.url) ?? []
   const dict = await getDictionary(locale as 'en' | 'fa')

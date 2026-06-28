@@ -15,7 +15,7 @@ export default async function AccessoryPage({
 
   const { data: accessory } = await supabaseAdmin
     .from('accessories')
-    .select('id, name_en, name_fa, slug, category, price, description_en, description_fa, in_stock')
+    .select('id, name_en, name_fa, slug, category, price, price_fa, description_en, description_fa, in_stock')
     .eq('slug', slug)
     .single()
 
@@ -25,7 +25,7 @@ export default async function AccessoryPage({
     .from('accessory_images')
     .select('url')
     .eq('accessory_id', accessory.id)
-    .order('order', { ascending: true })
+    .order('sort_order', { ascending: true })
 
   const images = imageRows?.map((r) => r.url) ?? []
   const dict = await getDictionary(locale as 'en' | 'fa')

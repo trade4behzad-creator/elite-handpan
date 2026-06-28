@@ -32,7 +32,7 @@ const fieldStyle: React.CSSProperties = {
   flexDirection: 'column',
 }
 
-export type ProductImage = { id: string; url: string; order: number }
+export type ProductImage = { id: string; url: string; sort_order: number }
 
 export type Product = {
   id: string
@@ -42,6 +42,7 @@ export type Product = {
   scale: string
   notes: number
   price: number
+  price_fa: number | null
   description_en: string | null
   description_fa: string | null
   note_arrangement: string | null
@@ -170,8 +171,8 @@ export default function EditProductForm({
             />
           </div>
 
-          {/* Scale + Notes + Price */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+          {/* Scale + Notes */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>گام (Scale)</label>
               <input
@@ -193,6 +194,10 @@ export default function EditProductForm({
                 style={{ ...inputStyle, direction: 'ltr' }}
               />
             </div>
+          </div>
+
+          {/* Price USD + Price Toman */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>قیمت (دلار)</label>
               <input
@@ -202,6 +207,16 @@ export default function EditProductForm({
                 min={0}
                 step="0.01"
                 defaultValue={product.price}
+                style={{ ...inputStyle, direction: 'ltr' }}
+              />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>قیمت (تومان)</label>
+              <input
+                name="price_fa"
+                type="number"
+                min={0}
+                defaultValue={product.price_fa ?? ''}
                 style={{ ...inputStyle, direction: 'ltr' }}
               />
             </div>
