@@ -7,8 +7,9 @@ import { supabase } from '@/lib/supabase'
 
 const GOLD = '#C9A84C'
 
-function phoneToEmail(phone: string) {
-  return `${phone.replace(/\D/g, '')}@elitehandpan.com`
+function formatPhone(phone: string) {
+  const cleaned = phone.trim()
+  return `${cleaned}@elitehandpan.com`
 }
 
 const inputClass =
@@ -41,15 +42,14 @@ export default function AuthPage() {
     e.preventDefault()
     setError(null)
 
-    const cleanPhone = phone.replace(/\D/g, '')
-    const fakeEmail = `${cleanPhone}@elitehandpan.com`
+    const fakeEmail = formatPhone(phone)
 
     if (mode === 'signup') {
       if (password !== confirmPassword) {
         setError(isFA ? 'رمز عبور و تکرار آن یکسان نیستند' : 'Passwords do not match')
         return
       }
-      if (cleanPhone.length < 10) {
+      if (phone.trim().length < 10) {
         setError(isFA ? 'شماره موبایل معتبر نیست' : 'Invalid phone number')
         return
       }
@@ -72,7 +72,7 @@ export default function AuthPage() {
       const { data, error: authErr } = await supabase.auth.signUp({
         email: fakeEmail,
         password,
-        options: { data: { full_name: name, phone: cleanPhone } },
+        options: { data: { full_name: name, phone: phone.trim() } },
       })
       if (authErr) {
         setError(isFA ? 'خطا در ثبت‌نام: ' + authErr.message : 'Sign up error: ' + authErr.message)
@@ -83,7 +83,7 @@ export default function AuthPage() {
         await supabase.from('profiles').upsert({
           user_id: data.user.id,
           full_name: name,
-          phone: cleanPhone,
+          phone: phone.trim(),
         })
       }
       router.push(`/${locale}/profile`)
