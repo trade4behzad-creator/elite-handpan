@@ -40,9 +40,9 @@ export default function EditProductPage() {
 
       const { data: imgs, error: imgErr } = await supabase
         .from('product_images')
-        .select('id, url, sort_order')
+        .select('*')
         .eq('product_id', id)
-        .order('sort_order', { ascending: true })
+        .order('sort_order')
 
       if (imgErr) console.error('[EditProductPage] images fetch error:', imgErr)
       setImages((imgs ?? []) as ProductImage[])
