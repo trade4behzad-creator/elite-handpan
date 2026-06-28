@@ -74,7 +74,7 @@ export default function Navbar({
       ref={navRef}
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${navBg}`}
     >
-      <div className="flex items-center justify-between px-4 md:px-8 lg:px-16 py-5">
+      <div className="flex items-center justify-between px-4 md:px-8 lg:px-16 py-3">
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center">
           <img src="/images/logo.png" alt="Elite Handpan" style={{ height: '100px', width: 'auto' }} />
