@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { supabase } from '../../../../../../lib/supabase'
+import { supabase } from '@/lib/supabase'
 import EditProductForm, { type Product, type ProductImage } from './EditProductForm'
 
 const GOLD = '#C9A84C'
