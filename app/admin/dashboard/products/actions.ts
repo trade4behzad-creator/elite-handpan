@@ -69,16 +69,16 @@ export async function updateProduct(formData: FormData) {
   if (validNewImages.length > 0) {
     await ensureBucket()
 
-    // Get next sort_order
+    // Get next order
     const { data: lastImg } = await supabaseAdmin
       .from('product_images')
-      .select('sort_order')
+      .select('order')
       .eq('product_id', id)
-      .order('sort_order', { ascending: false })
+      .order('order', { ascending: false })
       .limit(1)
       .single()
 
-    let nextOrder = lastImg?.sort_order != null ? lastImg.sort_order + 1 : 0
+    let nextOrder = lastImg?.order != null ? lastImg.order + 1 : 0
 
     for (const file of validNewImages) {
       const publicUrl = await uploadImage(file, slug)
@@ -87,7 +87,7 @@ export async function updateProduct(formData: FormData) {
       const { error: insertErr } = await supabaseAdmin.from('product_images').insert({
         product_id: id,
         url: publicUrl,
-        sort_order: nextOrder++,
+        order: nextOrder++,
       })
       if (insertErr) console.error('[db] insert product_images error:', insertErr)
     }
@@ -146,7 +146,7 @@ export async function createProduct(formData: FormData) {
       const { error: insertErr } = await supabaseAdmin.from('product_images').insert({
         product_id: product.id,
         url: publicUrl,
-        sort_order: i,
+        order: i,
       })
       if (insertErr) console.error('[db] insert product_images error:', insertErr)
     }

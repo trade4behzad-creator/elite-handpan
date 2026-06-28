@@ -25,7 +25,7 @@ export default async function AccessoryPage({
     .from('accessory_images')
     .select('url')
     .eq('accessory_id', accessory.id)
-    .order('sort_order', { ascending: true })
+    .order('order', { ascending: true })
 
   const images = imageRows?.map((r) => r.url) ?? []
   const dict = await getDictionary(locale as 'en' | 'fa')

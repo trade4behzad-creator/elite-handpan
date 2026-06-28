@@ -32,7 +32,7 @@ const fieldStyle: React.CSSProperties = {
   flexDirection: 'column',
 }
 
-export type ProductImage = { id: string; url: string; sort_order: number }
+export type ProductImage = { id: string; url: string; order: number }
 
 export type Product = {
   id: string
