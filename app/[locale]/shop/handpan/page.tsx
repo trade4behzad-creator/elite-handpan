@@ -38,7 +38,13 @@ function ProductsSkeleton() {
 async function ProductList({ locale, dict }: { locale: string; dict: Dictionary }) {
   const { data: products } = await supabaseAdmin
     .from('products')
-    .select('*, product_images(url, sort_order)')
+    .select(`
+      *,
+      product_images (
+        url,
+        sort_order
+      )
+    `)
     .eq('category', 'handpan')
     .order('created_at')
 
@@ -55,8 +61,9 @@ async function ProductList({ locale, dict }: { locale: string; dict: Dictionary 
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {(products as Product[]).map((product) => {
         const name = locale === 'fa' && product.name_fa ? product.name_fa : product.name_en
-        const sorted = [...(product.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
-        const img = sorted[0]?.url
+        const firstImage = product.product_images
+          ?.sort((a: { url: string; sort_order: number }, b: { url: string; sort_order: number }) => a.sort_order - b.sort_order)[0]?.url
+          || '/images/shop/handpan/p1/img1.jpg'
         return (
           <Link
             key={product.id}
@@ -64,14 +71,7 @@ async function ProductList({ locale, dict }: { locale: string; dict: Dictionary 
             className="group block bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden p-6"
           >
             <div className="aspect-square bg-[#f5f5f5] flex items-center justify-center rounded-sm overflow-hidden mb-5 p-4">
-              {img ? (
-                <img src={img} alt={name} className="w-full h-full object-contain mix-blend-multiply" />
-              ) : (
-                <svg className="w-16 h-16 text-gray-200" fill="none" viewBox="0 0 64 64" aria-hidden="true">
-                  <ellipse cx="32" cy="32" rx="28" ry="16" stroke="currentColor" strokeWidth="1.5" />
-                  <circle cx="32" cy="32" r="6" stroke="currentColor" strokeWidth="1.5" />
-                </svg>
-              )}
+              <img src={firstImage} alt={name} className="w-full h-full object-contain mix-blend-multiply" />
             </div>
             <h3
               className="text-lg md:text-xl text-[#111111] font-semibold mb-1"

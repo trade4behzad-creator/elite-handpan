@@ -23,24 +23,29 @@ export default async function ProductsSection({
 }) {
   const { data: rawProducts } = await supabaseAdmin
     .from('products')
-    .select('*, product_images(url, sort_order)')
+    .select(`
+      *,
+      product_images (
+        url,
+        sort_order
+      )
+    `)
     .eq('category', 'handpan')
     .order('created_at')
     .limit(6)
 
-  const products: GridProduct[] = ((rawProducts ?? []) as RawProduct[]).map((p) => {
-    const sorted = [...(p.product_images ?? [])].sort((a, b) => a.sort_order - b.sort_order)
-    return {
-      id: p.id,
-      name_en: p.name_en,
-      name_fa: p.name_fa,
-      slug: p.slug,
-      scale: p.scale,
-      notes: p.notes,
-      price: p.price,
-      firstImageUrl: sorted[0]?.url ?? null,
-    }
-  })
+  const products: GridProduct[] = ((rawProducts ?? []) as RawProduct[]).map((p) => ({
+    id: p.id,
+    name_en: p.name_en,
+    name_fa: p.name_fa,
+    slug: p.slug,
+    scale: p.scale,
+    notes: p.notes,
+    price: p.price,
+    firstImageUrl:
+      p.product_images?.sort((a, b) => a.sort_order - b.sort_order)[0]?.url
+      || '/images/shop/handpan/p1/img1.jpg',
+  }))
 
   return (
     <section
