@@ -93,10 +93,14 @@ export default function Navbar({
           </Link>
           <Link
             href={loggedIn ? `/${locale}/profile` : `/${locale}/auth`}
-            className={desktopLinkClass(loggedIn ? '/profile' : '/auth')}
             title={loggedIn ? (locale === 'fa' ? 'پروفایل' : 'Profile') : (locale === 'fa' ? 'ورود' : 'Sign In')}
+            style={{ color: loggedIn ? '#C9A84C' : undefined }}
+            className={loggedIn ? '' : 'text-white/70 hover:text-white transition-colors'}
           >
-            {loggedIn ? '👤' : (locale === 'fa' ? 'ورود' : 'Sign In')}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
           </Link>
           <LanguageSwitcher locale={locale} />
         </div>
@@ -139,9 +143,13 @@ export default function Navbar({
           <Link
             href={loggedIn ? `/${locale}/profile` : `/${locale}/auth`}
             onClick={closeMenu}
-            className={mobileLinkClass(loggedIn ? '/profile' : '/auth')}
+            className="flex items-center justify-center py-4 hover:bg-white/5 transition-colors"
+            style={{ color: loggedIn ? '#C9A84C' : 'rgba(255,255,255,0.7)' }}
           >
-            {loggedIn ? '👤 ' + (locale === 'fa' ? 'پروفایل' : 'Profile') : (locale === 'fa' ? 'ورود' : 'Sign In')}
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
           </Link>
         </div>
       )}
