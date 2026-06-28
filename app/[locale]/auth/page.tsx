@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase'
 const GOLD = '#C9A84C'
 
 function phoneToEmail(phone: string) {
-  return `${phone.replace(/\s/g, '')}@elitehandpan.com`
+  return `${phone.replace(/\D/g, '')}@elitehandpan.com`
 }
 
 const inputClass =
@@ -41,7 +41,8 @@ export default function AuthPage() {
     e.preventDefault()
     setError(null)
 
-    const cleanPhone = phone.replace(/\s/g, '')
+    const cleanPhone = phone.replace(/\D/g, '')
+    const fakeEmail = `${cleanPhone}@elitehandpan.com`
 
     if (mode === 'signup') {
       if (password !== confirmPassword) {
@@ -55,7 +56,6 @@ export default function AuthPage() {
     }
 
     setLoading(true)
-    const fakeEmail = phoneToEmail(cleanPhone)
 
     if (mode === 'login') {
       const { error: authErr } = await supabase.auth.signInWithPassword({
