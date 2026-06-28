@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import type { Dictionary } from '../i18n'
 import LanguageSwitcher from './LanguageSwitcher'
+import { supabase } from '@/lib/supabase'
 
 export default function Navbar({
   dict,
@@ -15,6 +16,7 @@ export default function Navbar({
 }) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [loggedIn, setLoggedIn] = useState(false)
   const pathname = usePathname()
   const navRef = useRef<HTMLElement>(null)
 
@@ -31,6 +33,16 @@ export default function Navbar({
     `block w-full text-center text-lg py-4 hover:bg-white/5 transition-colors ${
       isActive(segment) ? 'text-[#C9A84C]' : 'text-white'
     }`
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setLoggedIn(!!data.session)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setLoggedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60)
@@ -79,6 +91,13 @@ export default function Navbar({
           <Link href={`/${locale}/contact`} className={desktopLinkClass('/contact')}>
             {dict.nav.contact}
           </Link>
+          <Link
+            href={loggedIn ? `/${locale}/profile` : `/${locale}/auth`}
+            className={desktopLinkClass(loggedIn ? '/profile' : '/auth')}
+            title={loggedIn ? (locale === 'fa' ? 'پروفایل' : 'Profile') : (locale === 'fa' ? 'ورود' : 'Sign In')}
+          >
+            {loggedIn ? '👤' : (locale === 'fa' ? 'ورود' : 'Sign In')}
+          </Link>
           <LanguageSwitcher locale={locale} />
         </div>
 
@@ -114,8 +133,15 @@ export default function Navbar({
           <Link href={`/${locale}/about`} onClick={closeMenu} className={`${mobileLinkClass('/about')} border-b border-gray-800`}>
             About
           </Link>
-          <Link href={`/${locale}/contact`} onClick={closeMenu} className={mobileLinkClass('/contact')}>
+          <Link href={`/${locale}/contact`} onClick={closeMenu} className={`${mobileLinkClass('/contact')} border-b border-gray-800`}>
             Contact
+          </Link>
+          <Link
+            href={loggedIn ? `/${locale}/profile` : `/${locale}/auth`}
+            onClick={closeMenu}
+            className={mobileLinkClass(loggedIn ? '/profile' : '/auth')}
+          >
+            {loggedIn ? '👤 ' + (locale === 'fa' ? 'پروفایل' : 'Profile') : (locale === 'fa' ? 'ورود' : 'Sign In')}
           </Link>
         </div>
       )}
