@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useTransition } from 'react'
-import { useFormStatus } from 'react-dom'
-import { updateProduct, deleteProductImage } from '../../actions'
+import { useState, useTransition, useRef } from 'react'
+import { supabase } from '@/lib/supabase'
+import { updateProduct, deleteProductImage, saveImageRecord } from '../../actions'
 
 const GOLD = '#C9A84C'
+const BUCKET = 'product-images'
 const MAX_FILE_MB = 2
 
 const inputStyle: React.CSSProperties = {
@@ -49,31 +50,6 @@ export type Product = {
   in_stock: boolean
 }
 
-function SubmitButton() {
-  const { pending } = useFormStatus()
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      style={{
-        padding: '12px 28px',
-        background: pending ? '#8a7033' : GOLD,
-        border: 'none',
-        borderRadius: '4px',
-        color: '#0a0a0a',
-        fontSize: '14px',
-        fontWeight: '600',
-        cursor: pending ? 'not-allowed' : 'pointer',
-        fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
-        transition: 'background 0.2s',
-        whiteSpace: 'nowrap',
-      }}
-    >
-      {pending ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
-    </button>
-  )
-}
-
 export default function EditProductForm({
   product,
   images,
@@ -81,14 +57,19 @@ export default function EditProductForm({
   product: Product
   images: ProductImage[]
 }) {
+  const formRef = useRef<HTMLFormElement>(null)
   const [existingImages, setExistingImages] = useState<ProductImage[]>(images)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [newPreviews, setNewPreviews] = useState<string[]>([])
   const [fileError, setFileError] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [inStock, setInStock] = useState(product.in_stock)
   const [isPending, startTransition] = useTransition()
 
   const remainingSlots = Math.max(0, 3 - existingImages.length)
+  const isSubmitting = uploading || isPending
 
   function handleDeleteImage(imageId: string, imageUrl: string) {
     setDeletingId(imageId)
@@ -101,14 +82,56 @@ export default function EditProductForm({
 
   function handleNewImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFileError(null)
-    const files = Array.from(e.target.files ?? []).slice(0, remainingSlots)
+    setUploadError(null)
+    const files = Array.from(e.target.files ?? []).slice(0, remainingSlots) as File[]
     const oversized = files.find((f) => f.size > MAX_FILE_MB * 1024 * 1024)
     if (oversized) {
       setFileError(`فایل "${oversized.name}" بیشتر از ${MAX_FILE_MB}MB است`)
       e.target.value = ''
+      setSelectedFiles([])
+      setNewPreviews([])
       return
     }
+    setSelectedFiles(files)
     setNewPreviews(files.map((f) => URL.createObjectURL(f)))
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setUploadError(null)
+    setUploading(true)
+
+    // Upload each selected file directly from browser to Supabase Storage
+    let nextOrder = existingImages.length
+    for (const file of selectedFiles) {
+      const path = `products/${product.slug}/${Date.now()}-${file.name}`
+      console.log('Uploading:', path)
+
+      const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, { upsert: true })
+
+      if (error) {
+        console.error('Upload error:', error)
+        setUploadError(`خطا در آپلود "${file.name}": ${error.message}`)
+        setUploading(false)
+        return
+      }
+
+      console.log('Upload success:', data)
+
+      const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(path)
+      console.log('Public URL:', publicUrl)
+
+      await saveImageRecord(product.id, publicUrl, nextOrder++)
+    }
+
+    // Submit product fields via server action
+    const formData = new FormData(formRef.current!)
+    setUploading(false)
+    startTransition(async () => {
+      await updateProduct(formData)
+    })
   }
 
   return (
@@ -123,7 +146,7 @@ export default function EditProductForm({
         <div style={{ width: '40px', height: '1px', background: GOLD, marginTop: '12px', opacity: 0.5 }} />
       </div>
 
-      <form action={updateProduct}>
+      <form ref={formRef} onSubmit={handleSubmit}>
         <input type="hidden" name="id" value={product.id} />
         <input type="hidden" name="in_stock" value={String(inStock)} />
 
@@ -142,83 +165,41 @@ export default function EditProductForm({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>نام (انگلیسی)</label>
-              <input
-                name="name_en"
-                required
-                defaultValue={product.name_en}
-                style={{ ...inputStyle, direction: 'ltr' }}
-              />
+              <input name="name_en" required defaultValue={product.name_en} style={{ ...inputStyle, direction: 'ltr' }} />
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>نام (فارسی)</label>
-              <input
-                name="name_fa"
-                required
-                defaultValue={product.name_fa ?? ''}
-                style={inputStyle}
-              />
+              <input name="name_fa" required defaultValue={product.name_fa ?? ''} style={inputStyle} />
             </div>
           </div>
 
           {/* Slug */}
           <div style={fieldStyle}>
             <label style={labelStyle}>Slug (آدرس صفحه)</label>
-            <input
-              name="slug"
-              required
-              defaultValue={product.slug}
-              style={{ ...inputStyle, direction: 'ltr', color: GOLD }}
-            />
+            <input name="slug" required defaultValue={product.slug} style={{ ...inputStyle, direction: 'ltr', color: GOLD }} />
           </div>
 
           {/* Scale + Notes */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>گام (Scale)</label>
-              <input
-                name="scale"
-                required
-                defaultValue={product.scale}
-                style={{ ...inputStyle, direction: 'ltr' }}
-              />
+              <input name="scale" required defaultValue={product.scale} style={{ ...inputStyle, direction: 'ltr' }} />
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>تعداد نت</label>
-              <input
-                name="notes"
-                type="number"
-                required
-                min={1}
-                max={20}
-                defaultValue={product.notes}
-                style={{ ...inputStyle, direction: 'ltr' }}
-              />
+              <input name="notes" type="number" required min={1} max={20} defaultValue={product.notes} style={{ ...inputStyle, direction: 'ltr' }} />
             </div>
           </div>
 
-          {/* Price USD + Price Toman */}
+          {/* Prices */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>قیمت (دلار)</label>
-              <input
-                name="price"
-                type="number"
-                required
-                min={0}
-                step="0.01"
-                defaultValue={product.price}
-                style={{ ...inputStyle, direction: 'ltr' }}
-              />
+              <input name="price" type="number" required min={0} step="0.01" defaultValue={product.price} style={{ ...inputStyle, direction: 'ltr' }} />
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>قیمت (تومان)</label>
-              <input
-                name="price_fa"
-                type="number"
-                min={0}
-                defaultValue={product.price_fa ?? ''}
-                style={{ ...inputStyle, direction: 'ltr' }}
-              />
+              <input name="price_fa" type="number" min={0} defaultValue={product.price_fa ?? ''} style={{ ...inputStyle, direction: 'ltr' }} />
             </div>
           </div>
 
@@ -226,32 +207,18 @@ export default function EditProductForm({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>توضیحات (انگلیسی)</label>
-              <textarea
-                name="description_en"
-                rows={4}
-                defaultValue={product.description_en ?? ''}
-                style={{ ...inputStyle, direction: 'ltr', resize: 'vertical' }}
-              />
+              <textarea name="description_en" rows={4} defaultValue={product.description_en ?? ''} style={{ ...inputStyle, direction: 'ltr', resize: 'vertical' }} />
             </div>
             <div style={fieldStyle}>
               <label style={labelStyle}>توضیحات (فارسی)</label>
-              <textarea
-                name="description_fa"
-                rows={4}
-                defaultValue={product.description_fa ?? ''}
-                style={{ ...inputStyle, resize: 'vertical' }}
-              />
+              <textarea name="description_fa" rows={4} defaultValue={product.description_fa ?? ''} style={{ ...inputStyle, resize: 'vertical' }} />
             </div>
           </div>
 
           {/* Note arrangement */}
           <div style={fieldStyle}>
             <label style={labelStyle}>آرایش نت‌ها</label>
-            <input
-              name="note_arrangement"
-              defaultValue={product.note_arrangement ?? ''}
-              style={{ ...inputStyle, direction: 'ltr' }}
-            />
+            <input name="note_arrangement" defaultValue={product.note_arrangement ?? ''} style={{ ...inputStyle, direction: 'ltr' }} />
           </div>
 
           {/* In-stock toggle */}
@@ -292,7 +259,7 @@ export default function EditProductForm({
             </span>
           </div>
 
-          {/* ── Images section ── */}
+          {/* Images */}
           <div style={fieldStyle}>
             <label style={{ ...labelStyle, marginBottom: '16px' }}>
               تصاویر محصول
@@ -307,47 +274,23 @@ export default function EditProductForm({
                 {existingImages.map((img) => {
                   const isDeleting = deletingId === img.id
                   return (
-                    <div
-                      key={img.id}
-                      style={{
-                        position: 'relative',
-                        width: '110px',
-                        opacity: isDeleting ? 0.4 : 1,
-                        transition: 'opacity 0.2s',
-                      }}
-                    >
+                    <div key={img.id} style={{ position: 'relative', width: '110px', opacity: isDeleting ? 0.4 : 1, transition: 'opacity 0.2s' }}>
                       <img
                         src={img.url}
                         alt="product"
-                        style={{
-                          width: '110px',
-                          height: '110px',
-                          objectFit: 'cover',
-                          borderRadius: '6px',
-                          border: `1px solid ${GOLD}30`,
-                          display: 'block',
-                        }}
+                        style={{ width: '110px', height: '110px', objectFit: 'cover', borderRadius: '6px', border: `1px solid ${GOLD}30`, display: 'block' }}
                       />
                       <button
                         type="button"
                         disabled={isDeleting || isPending}
                         onClick={() => handleDeleteImage(img.id, img.url)}
                         style={{
-                          position: 'absolute',
-                          top: '6px',
-                          left: '6px',
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
+                          position: 'absolute', top: '6px', left: '6px',
+                          width: '24px', height: '24px', borderRadius: '50%',
                           background: isDeleting ? '#555' : 'rgba(239,68,68,0.9)',
-                          border: 'none',
-                          color: '#fff',
-                          fontSize: '14px',
-                          lineHeight: '1',
+                          border: 'none', color: '#fff', fontSize: '14px',
                           cursor: isDeleting ? 'wait' : 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
                           fontFamily: 'monospace',
                         }}
                         title="حذف تصویر"
@@ -362,16 +305,8 @@ export default function EditProductForm({
 
             {/* New image upload */}
             {remainingSlots > 0 ? (
-              <div
-                style={{
-                  border: '1px dashed #2a2a2a',
-                  borderRadius: '6px',
-                  padding: '20px 24px',
-                  textAlign: 'center',
-                }}
-              >
+              <div style={{ border: '1px dashed #2a2a2a', borderRadius: '6px', padding: '20px 24px', textAlign: 'center' }}>
                 <input
-                  name="new_images"
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   multiple
@@ -382,22 +317,17 @@ export default function EditProductForm({
                 <label
                   htmlFor="new-images-input"
                   style={{
-                    display: 'inline-block',
-                    padding: '9px 20px',
-                    border: `1px solid ${GOLD}40`,
-                    borderRadius: '4px',
-                    color: GOLD,
-                    fontSize: '13px',
-                    cursor: 'pointer',
-                    marginBottom: newPreviews.length || fileError ? '12px' : '0',
+                    display: 'inline-block', padding: '9px 20px',
+                    border: `1px solid ${GOLD}40`, borderRadius: '4px',
+                    color: GOLD, fontSize: '13px', cursor: 'pointer',
+                    marginBottom: newPreviews.length || fileError || uploadError ? '12px' : '0',
                   }}
                 >
                   + افزودن تصویر ({remainingSlots} جای خالی)
                 </label>
 
-                {fileError && (
-                  <p style={{ color: '#f87171', fontSize: '12px', margin: '0 0 8px' }}>{fileError}</p>
-                )}
+                {fileError && <p style={{ color: '#f87171', fontSize: '12px', margin: '0 0 8px' }}>{fileError}</p>}
+                {uploadError && <p style={{ color: '#f87171', fontSize: '12px', margin: '0 0 8px', direction: 'ltr', fontFamily: 'monospace' }}>{uploadError}</p>}
 
                 {newPreviews.length > 0 && (
                   <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -406,13 +336,7 @@ export default function EditProductForm({
                         key={i}
                         src={src}
                         alt={`new-${i}`}
-                        style={{
-                          width: '90px',
-                          height: '90px',
-                          objectFit: 'cover',
-                          borderRadius: '4px',
-                          border: `1px solid ${GOLD}40`,
-                        }}
+                        style={{ width: '90px', height: '90px', objectFit: 'cover', borderRadius: '4px', border: `1px solid ${GOLD}40` }}
                       />
                     ))}
                   </div>
@@ -429,19 +353,25 @@ export default function EditProductForm({
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', paddingTop: '8px' }}>
             <a
               href="/admin/dashboard/products"
-              style={{
-                padding: '12px 28px',
-                background: 'transparent',
-                border: '1px solid #2a2a2a',
-                borderRadius: '4px',
-                color: '#666',
-                fontSize: '14px',
-                textDecoration: 'none',
-              }}
+              style={{ padding: '12px 28px', background: 'transparent', border: '1px solid #2a2a2a', borderRadius: '4px', color: '#666', fontSize: '14px', textDecoration: 'none' }}
             >
               انصراف
             </a>
-            <SubmitButton />
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              style={{
+                padding: '12px 28px',
+                background: isSubmitting ? '#8a7033' : GOLD,
+                border: 'none', borderRadius: '4px',
+                color: '#0a0a0a', fontSize: '14px', fontWeight: '600',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+                transition: 'background 0.2s', whiteSpace: 'nowrap',
+              }}
+            >
+              {uploading ? 'در حال آپلود...' : isPending ? 'در حال ذخیره...' : 'ذخیره تغییرات'}
+            </button>
           </div>
         </div>
       </form>

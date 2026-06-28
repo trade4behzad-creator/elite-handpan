@@ -13,11 +13,8 @@ async function ensureBucket() {
   }
   if (!buckets?.find((b) => b.name === BUCKET)) {
     const { error: createErr } = await supabaseAdmin.storage.createBucket(BUCKET, { public: true })
-    if (createErr) {
-      console.error('[storage] createBucket error:', createErr)
-    } else {
-      console.log(`[storage] bucket "${BUCKET}" created`)
-    }
+    if (createErr) console.error('[storage] createBucket error:', createErr)
+    else console.log(`[storage] bucket "${BUCKET}" created`)
   }
 }
 
@@ -27,7 +24,7 @@ async function uploadImage(file: File, slug: string): Promise<string | null> {
 
   const { data: stored, error } = await supabaseAdmin.storage
     .from(BUCKET)
-    .upload(path, buffer, { contentType: file.type, upsert: false })
+    .upload(path, buffer, { contentType: file.type, upsert: true })
 
   if (error || !stored) {
     console.error('[storage] upload error:', error)
@@ -35,8 +32,17 @@ async function uploadImage(file: File, slug: string): Promise<string | null> {
   }
 
   const { data: { publicUrl } } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(stored.path)
-  console.log('[storage] uploaded:', publicUrl)
   return publicUrl
+}
+
+// Called from EditProductForm client component after client-side storage upload
+export async function saveImageRecord(productId: string, url: string, order: number) {
+  const { error } = await supabaseAdmin.from('product_images').insert({
+    product_id: productId,
+    url,
+    order,
+  })
+  if (error) console.error('[db] saveImageRecord error:', error)
 }
 
 export async function updateProduct(formData: FormData) {
@@ -53,44 +59,15 @@ export async function updateProduct(formData: FormData) {
   const in_stock = formData.get('in_stock') === 'true'
   const price_fa_raw = formData.get('price_fa') as string
   const price_fa = price_fa_raw && price_fa_raw.trim() !== '' ? parseInt(price_fa_raw.trim(), 10) : null
-  const newImages = formData.getAll('new_images') as File[]
 
-  const { error: updateErr } = await supabaseAdmin
+  const { error } = await supabaseAdmin
     .from('products')
     .update({ name_en, name_fa, slug, scale, notes, price, price_fa, description_en, description_fa, note_arrangement, in_stock })
     .eq('id', id)
 
-  if (updateErr) {
-    console.error('[db] updateProduct error:', updateErr)
+  if (error) {
+    console.error('[db] updateProduct error:', error)
     redirect(`/admin/dashboard/products/edit/${id}?error=db`)
-  }
-
-  const validNewImages = newImages.filter((f) => f && f.size > 0)
-  if (validNewImages.length > 0) {
-    await ensureBucket()
-
-    // Get next order
-    const { data: lastImg } = await supabaseAdmin
-      .from('product_images')
-      .select('order')
-      .eq('product_id', id)
-      .order('order', { ascending: false })
-      .limit(1)
-      .single()
-
-    let nextOrder = lastImg?.order != null ? lastImg.order + 1 : 0
-
-    for (const file of validNewImages) {
-      const publicUrl = await uploadImage(file, slug)
-      if (!publicUrl) continue
-
-      const { error: insertErr } = await supabaseAdmin.from('product_images').insert({
-        product_id: id,
-        url: publicUrl,
-        order: nextOrder++,
-      })
-      if (insertErr) console.error('[db] insert product_images error:', insertErr)
-    }
   }
 
   redirect('/admin/dashboard/products?success=1')
@@ -138,11 +115,9 @@ export async function createProduct(formData: FormData) {
   const validImages = images.filter((f) => f && f.size > 0)
   if (validImages.length > 0) {
     await ensureBucket()
-
     for (let i = 0; i < validImages.length; i++) {
       const publicUrl = await uploadImage(validImages[i], slug)
       if (!publicUrl) continue
-
       const { error: insertErr } = await supabaseAdmin.from('product_images').insert({
         product_id: product.id,
         url: publicUrl,
