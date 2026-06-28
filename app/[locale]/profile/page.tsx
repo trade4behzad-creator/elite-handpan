@@ -8,21 +8,25 @@ import type { User } from '@supabase/supabase-js'
 
 const GOLD = '#C9A84C'
 
+type Profile = {
+  full_name: string | null
+  phone: string | null
+}
+
 type Order = {
   id: string
   created_at: string
   status: string
   total_usd: number | null
   total_fa: number | null
-  customer_name: string | null
 }
 
 const STATUS_LABELS: Record<string, { en: string; fa: string; color: string }> = {
-  pending:   { en: 'Pending',   fa: 'در انتظار',   color: '#f59e0b' },
-  confirmed: { en: 'Confirmed', fa: 'تأیید شده',   color: '#3b82f6' },
-  shipped:   { en: 'Shipped',   fa: 'ارسال شده',   color: '#8b5cf6' },
+  pending:   { en: 'Pending',   fa: 'در انتظار',      color: '#f59e0b' },
+  confirmed: { en: 'Confirmed', fa: 'تأیید شده',      color: '#3b82f6' },
+  shipped:   { en: 'Shipped',   fa: 'ارسال شده',      color: '#8b5cf6' },
   delivered: { en: 'Delivered', fa: 'تحویل داده شده', color: '#22c55e' },
-  cancelled: { en: 'Cancelled', fa: 'لغو شده',     color: '#ef4444' },
+  cancelled: { en: 'Cancelled', fa: 'لغو شده',        color: '#ef4444' },
 }
 
 function formatDate(iso: string, isFA: boolean) {
@@ -38,6 +42,7 @@ export default function ProfilePage() {
   const isFA = locale === 'fa'
 
   const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -50,13 +55,21 @@ export default function ProfilePage() {
       }
       setUser(u)
 
-      const { data } = await supabase
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('full_name, phone')
+        .eq('user_id', u.id)
+        .single()
+
+      setProfile(profileData as Profile | null)
+
+      const { data: ordersData } = await supabase
         .from('orders')
-        .select('id, created_at, status, total_usd, total_fa, customer_name')
+        .select('id, created_at, status, total_usd, total_fa')
         .eq('user_id', u.id)
         .order('created_at', { ascending: false })
 
-      setOrders((data ?? []) as Order[])
+      setOrders((ordersData ?? []) as Order[])
       setLoading(false)
     }
     load()
@@ -76,6 +89,9 @@ export default function ProfilePage() {
       </div>
     )
   }
+
+  const displayName = profile?.full_name ?? user?.user_metadata?.full_name ?? null
+  const displayPhone = profile?.phone ?? user?.user_metadata?.phone ?? null
 
   return (
     <div className="min-h-screen bg-white" dir={isFA ? 'rtl' : 'ltr'}>
@@ -115,23 +131,27 @@ export default function ProfilePage() {
           <div className="mt-5 h-px w-12 bg-[#C9A84C] opacity-60" />
         </div>
 
-        {/* User card */}
-        <div className="mb-12 p-6 border border-gray-100 rounded-[4px]">
-          <p className="text-xs text-gray-400 mb-1 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
-            {isFA ? 'ایمیل' : 'Email'}
-          </p>
-          <p className="text-[#111] text-sm" style={{ fontFamily: 'var(--font-inter)', direction: 'ltr' }}>
-            {user?.email}
-          </p>
-          {user?.user_metadata?.full_name && (
-            <>
-              <p className="text-xs text-gray-400 mt-4 mb-1 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
-                {isFA ? 'نام' : 'Name'}
+        {/* User info card */}
+        <div className="mb-12 p-6 border border-gray-100 rounded-[4px] flex flex-col gap-4">
+          {displayName && (
+            <div>
+              <p className="text-xs text-gray-400 mb-1 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
+                {isFA ? 'نام کامل' : 'Full Name'}
               </p>
-              <p className="text-[#111] text-sm" style={{ fontFamily: 'var(--font-inter)' }}>
-                {user.user_metadata.full_name}
+              <p className="text-[#111] text-sm" style={{ fontFamily: 'var(--font-vazirmatn), Arial, sans-serif' }}>
+                {displayName}
               </p>
-            </>
+            </div>
+          )}
+          {displayPhone && (
+            <div>
+              <p className="text-xs text-gray-400 mb-1 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
+                {isFA ? 'شماره موبایل' : 'Phone Number'}
+              </p>
+              <p className="text-[#111] text-sm" style={{ fontFamily: 'var(--font-inter)', direction: 'ltr' }}>
+                {displayPhone}
+              </p>
+            </div>
           )}
         </div>
 

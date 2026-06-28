@@ -7,71 +7,91 @@ import { supabase } from '@/lib/supabase'
 
 const GOLD = '#C9A84C'
 
+function phoneToEmail(phone: string) {
+  return `${phone.replace(/\s/g, '')}@elitehandpan.com`
+}
+
+const inputClass =
+  'w-full px-4 py-3 border border-gray-200 rounded-[4px] text-sm text-[#111] focus:outline-none focus:border-[#C9A84C] transition-colors'
+
 export default function AuthPage() {
   const params = useParams<{ locale: string }>()
   const locale = params?.locale ?? 'en'
   const router = useRouter()
+  const isFA = locale === 'fa'
 
   const [mode, setMode] = useState<'login' | 'signup'>('login')
-  const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
-  const isFA = locale === 'fa'
-
-  const t = {
-    login: isFA ? 'ورود' : 'Sign In',
-    signup: isFA ? 'ثبت‌نام' : 'Sign Up',
-    email: isFA ? 'ایمیل' : 'Email',
-    password: isFA ? 'رمز عبور' : 'Password',
-    name: isFA ? 'نام' : 'Full Name',
-    submit: isFA ? 'ادامه' : 'Continue',
-    switchToSignup: isFA ? 'حساب کاربری ندارید؟ ثبت‌نام کنید' : "Don't have an account? Sign up",
-    switchToLogin: isFA ? 'حساب دارید؟ وارد شوید' : 'Already have an account? Sign in',
-    signupSuccess: isFA
-      ? 'ثبت‌نام موفق! ایمیل تأیید را بررسی کنید.'
-      : 'Registered! Check your email to confirm.',
-    backToHome: isFA ? 'بازگشت به خانه' : 'Back to home',
+  function switchMode() {
+    setMode(mode === 'login' ? 'signup' : 'login')
+    setError(null)
+    setPhone('')
+    setPassword('')
+    setConfirmPassword('')
+    setName('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
     setError(null)
-    setSuccess(null)
+
+    const cleanPhone = phone.replace(/\s/g, '')
+
+    if (mode === 'signup') {
+      if (password !== confirmPassword) {
+        setError(isFA ? 'رمز عبور و تکرار آن یکسان نیستند' : 'Passwords do not match')
+        return
+      }
+      if (cleanPhone.length < 10) {
+        setError(isFA ? 'شماره موبایل معتبر نیست' : 'Invalid phone number')
+        return
+      }
+    }
+
+    setLoading(true)
+    const fakeEmail = phoneToEmail(cleanPhone)
 
     if (mode === 'login') {
-      const { error: authErr } = await supabase.auth.signInWithPassword({ email, password })
+      const { error: authErr } = await supabase.auth.signInWithPassword({
+        email: fakeEmail,
+        password,
+      })
       if (authErr) {
-        setError(isFA ? 'ایمیل یا رمز عبور اشتباه است' : 'Invalid email or password')
+        setError(isFA ? 'شماره موبایل یا رمز عبور اشتباه است' : 'Invalid phone number or password')
         setLoading(false)
         return
       }
       router.push(`/${locale}/profile`)
     } else {
-      const { error: authErr } = await supabase.auth.signUp({
-        email,
+      const { data, error: authErr } = await supabase.auth.signUp({
+        email: fakeEmail,
         password,
-        options: { data: { full_name: name } },
+        options: { data: { full_name: name, phone: cleanPhone } },
       })
       if (authErr) {
-        setError(authErr.message)
+        setError(isFA ? 'خطا در ثبت‌نام: ' + authErr.message : 'Sign up error: ' + authErr.message)
         setLoading(false)
         return
       }
-      setSuccess(t.signupSuccess)
-      setLoading(false)
+      if (data.user) {
+        await supabase.from('profiles').upsert({
+          user_id: data.user.id,
+          full_name: name,
+          phone: cleanPhone,
+        })
+      }
+      router.push(`/${locale}/profile`)
     }
   }
 
   return (
-    <div
-      className="min-h-screen bg-white flex flex-col"
-      dir={isFA ? 'rtl' : 'ltr'}
-    >
+    <div className="min-h-screen bg-white flex flex-col" dir={isFA ? 'rtl' : 'ltr'}>
       {/* Top bar */}
       <div className="px-8 py-6 flex items-center justify-between border-b border-gray-100">
         <Link
@@ -86,13 +106,14 @@ export default function AuthPage() {
           className="text-gray-400 text-sm hover:text-gray-600 transition-colors"
           style={{ fontFamily: 'var(--font-inter)' }}
         >
-          {t.backToHome}
+          {isFA ? 'بازگشت به خانه' : 'Back to home'}
         </Link>
       </div>
 
-      {/* Form card */}
+      {/* Form */}
       <div className="flex-1 flex items-center justify-center px-8 py-16">
         <div className="w-full max-w-md">
+          {/* Heading */}
           <div className="mb-10">
             <p
               className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-4"
@@ -104,57 +125,57 @@ export default function AuthPage() {
               className="text-4xl font-light text-[#111111]"
               style={{ fontFamily: 'var(--font-cormorant)' }}
             >
-              {mode === 'login' ? t.login : t.signup}
+              {mode === 'login'
+                ? (isFA ? 'ورود' : 'Sign In')
+                : (isFA ? 'ثبت‌نام' : 'Sign Up')}
             </h1>
             <div className="mt-5 h-px w-12 bg-[#C9A84C] opacity-60" />
           </div>
 
-          {success && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded text-green-700 text-sm">
-              {success}
-            </div>
-          )}
-
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-[4px] text-red-600 text-sm">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+            {/* Full name — signup only */}
             {mode === 'signup' && (
               <div className="flex flex-col gap-2">
                 <label className="text-xs text-gray-500 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
-                  {t.name}
+                  {isFA ? 'نام کامل' : 'Full Name'}
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-[4px] text-sm text-[#111] focus:outline-none focus:border-[#C9A84C] transition-colors"
-                  style={{ fontFamily: 'var(--font-inter)', direction: 'ltr' }}
+                  className={inputClass}
+                  style={{ fontFamily: 'var(--font-vazirmatn), Arial, sans-serif' }}
                 />
               </div>
             )}
 
+            {/* Phone */}
             <div className="flex flex-col gap-2">
               <label className="text-xs text-gray-500 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
-                {t.email}
+                {isFA ? 'شماره موبایل' : 'Phone Number'}
               </label>
               <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-[4px] text-sm text-[#111] focus:outline-none focus:border-[#C9A84C] transition-colors"
+                placeholder={isFA ? '09123456789' : '09123456789'}
+                className={inputClass}
                 style={{ fontFamily: 'var(--font-inter)', direction: 'ltr' }}
               />
             </div>
 
+            {/* Password */}
             <div className="flex flex-col gap-2">
               <label className="text-xs text-gray-500 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
-                {t.password}
+                {isFA ? 'رمز عبور' : 'Password'}
               </label>
               <input
                 type="password"
@@ -162,15 +183,33 @@ export default function AuthPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-[4px] text-sm text-[#111] focus:outline-none focus:border-[#C9A84C] transition-colors"
+                className={inputClass}
                 style={{ fontFamily: 'var(--font-inter)', direction: 'ltr' }}
               />
             </div>
 
+            {/* Confirm password — signup only */}
+            {mode === 'signup' && (
+              <div className="flex flex-col gap-2">
+                <label className="text-xs text-gray-500 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
+                  {isFA ? 'تکرار رمز عبور' : 'Confirm Password'}
+                </label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className={inputClass}
+                  style={{ fontFamily: 'var(--font-inter)', direction: 'ltr' }}
+                />
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
-              className="mt-2 w-full py-3 rounded-[4px] text-sm font-semibold tracking-wide transition-opacity"
+              className="mt-2 w-full py-3 rounded-[4px] text-sm font-semibold tracking-wide"
               style={{
                 background: loading ? '#b8973e' : GOLD,
                 color: '#0a0a0a',
@@ -179,17 +218,19 @@ export default function AuthPage() {
                 border: 'none',
               }}
             >
-              {loading ? '...' : t.submit}
+              {loading ? (isFA ? 'لطفاً صبر کنید...' : 'Please wait...') : (isFA ? 'ادامه' : 'Continue')}
             </button>
           </form>
 
           <button
             type="button"
-            onClick={() => { setMode(mode === 'login' ? 'signup' : 'login'); setError(null); setSuccess(null) }}
+            onClick={switchMode}
             className="mt-6 w-full text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
             style={{ fontFamily: 'var(--font-inter)', background: 'none', border: 'none', cursor: 'pointer' }}
           >
-            {mode === 'login' ? t.switchToSignup : t.switchToLogin}
+            {mode === 'login'
+              ? (isFA ? 'حساب کاربری ندارید؟ ثبت‌نام کنید' : "Don't have an account? Sign up")
+              : (isFA ? 'حساب دارید؟ وارد شوید' : 'Already have an account? Sign in')}
           </button>
         </div>
       </div>
