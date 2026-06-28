@@ -2,10 +2,37 @@
 
 import { useState, useTransition, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { updateProduct, deleteProductImage, saveImageRecord } from '../../actions'
+import { updateProduct, deleteProductImage } from '../../actions'
 
 const GOLD = '#C9A84C'
 const BUCKET = 'product-images'
+
+async function uploadImage(file: File, slug: string): Promise<string> {
+  const fileExt = file.name.split('.').pop()
+  const fileName = `${Date.now()}.${fileExt}`
+  const filePath = `products/${slug}/${fileName}`
+
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: true,
+    })
+
+  if (error) {
+    console.error('Storage error:', error)
+    throw error
+  }
+
+  console.log('Upload success:', data)
+
+  const { data: { publicUrl } } = supabase.storage
+    .from(BUCKET)
+    .getPublicUrl(filePath)
+
+  console.log('Public URL:', publicUrl)
+  return publicUrl
+}
 const MAX_FILE_MB = 2
 
 const inputStyle: React.CSSProperties = {
@@ -102,28 +129,32 @@ export default function EditProductForm({
     setUploading(true)
 
     // Upload each selected file directly from browser to Supabase Storage
-    let nextOrder = existingImages.length
-    for (const file of selectedFiles) {
-      const path = `products/${product.slug}/${Date.now()}-${file.name}`
-      console.log('Uploading:', path)
+    for (let i = 0; i < selectedFiles.length; i++) {
+      const file = selectedFiles[i]
+      try {
+        const publicUrl = await uploadImage(file, product.slug)
 
-      const { data, error } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, file, { upsert: true })
+        const { error: insertErr } = await supabase.from('product_images').insert({
+          product_id: product.id,
+          url: publicUrl,
+          sort_order: existingImages.length + i,
+        })
 
-      if (error) {
-        console.error('Upload error:', error)
-        setUploadError(`خطا در آپلود "${file.name}": ${error.message}`)
+        if (insertErr) {
+          console.error('DB insert error:', insertErr)
+          alert(`خطا در ذخیره تصویر: ${insertErr.message}`)
+          setUploading(false)
+          return
+        }
+
+        alert(`تصویر "${file.name}" با موفقیت آپلود شد`)
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err)
+        setUploadError(`خطا در آپلود "${file.name}": ${msg}`)
+        alert(`خطا در آپلود: ${msg}`)
         setUploading(false)
         return
       }
-
-      console.log('Upload success:', data)
-
-      const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(path)
-      console.log('Public URL:', publicUrl)
-
-      await saveImageRecord(product.id, publicUrl, nextOrder++)
     }
 
     // Submit product fields via server action
