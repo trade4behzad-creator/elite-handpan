@@ -1,5 +1,5 @@
 import type { Dictionary } from '../i18n'
-import { supabaseAdmin } from '../../lib/supabase'
+import { supabaseAdmin } from '../../lib/supabase-admin'
 import ProductsGrid from './ProductsGrid'
 import type { GridProduct } from './ProductsGrid'
 

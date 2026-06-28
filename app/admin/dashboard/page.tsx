@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../../../lib/supabase'
+import { supabaseAdmin } from '../../../lib/supabase-admin'
 
 async function getStats() {
   const [{ count: products }, { count: messages }] = await Promise.all([

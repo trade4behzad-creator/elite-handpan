@@ -3,7 +3,7 @@ import { getDictionary, hasLocale } from '../../../../i18n'
 import Navbar from '../../../../components/Navbar'
 import Footer from '../../../../components/Footer'
 import AccessoryDetail from './AccessoryDetail'
-import { supabaseAdmin } from '../../../../../lib/supabase'
+import { supabaseAdmin } from '../../../../../lib/supabase-admin'
 
 export default async function AccessoryPage({
   params,

@@ -5,7 +5,7 @@ import { getDictionary, hasLocale } from '../../../i18n'
 import type { Dictionary } from '../../../i18n'
 import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
-import { supabaseAdmin } from '../../../../lib/supabase'
+import { supabaseAdmin } from '../../../../lib/supabase-admin'
 
 type Accessory = {
   id: string

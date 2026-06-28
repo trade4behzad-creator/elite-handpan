@@ -1,7 +1,7 @@
 'use server'
 
 import { redirect } from 'next/navigation'
-import { supabaseAdmin } from '../../../../lib/supabase'
+import { supabaseAdmin } from '../../../../lib/supabase-admin'
 
 const BUCKET = 'product-images'
 
