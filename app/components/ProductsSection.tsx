@@ -3,17 +3,6 @@ import { supabaseAdmin } from '../../lib/supabase-admin'
 import ProductsGrid from './ProductsGrid'
 import type { GridProduct } from './ProductsGrid'
 
-type RawProduct = {
-  id: string
-  name_en: string
-  name_fa: string | null
-  slug: string
-  scale: string
-  notes: number
-  price: number
-  product_images: { url: string; sort_order: number }[] | null
-}
-
 export default async function ProductsSection({
   dict,
   locale,
@@ -21,31 +10,31 @@ export default async function ProductsSection({
   dict: Dictionary
   locale: string
 }) {
-  const { data: rawProducts } = await supabaseAdmin
+  const { data: products, error } = await supabaseAdmin
     .from('products')
-    .select(`
-      *,
-      product_images (
-        url,
-        sort_order
-      )
-    `)
+    .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, in_stock, product_images(id, url, sort_order)')
     .eq('category', 'handpan')
     .order('created_at')
     .limit(6)
 
-  const products: GridProduct[] = ((rawProducts ?? []) as RawProduct[]).map((p) => ({
-    id: p.id,
-    name_en: p.name_en,
-    name_fa: p.name_fa,
-    slug: p.slug,
-    scale: p.scale,
-    notes: p.notes,
-    price: p.price,
-    firstImageUrl:
-      p.product_images?.sort((a, b) => a.sort_order - b.sort_order)[0]?.url
-      || '/images/shop/handpan/p1/img1.jpg',
-  }))
+  console.log('ProductsSection products:', JSON.stringify(products, null, 2))
+  if (error) console.error('ProductsSection error:', error)
+
+  const gridProducts: GridProduct[] = (products ?? []).map((p: any) => {
+    const imageUrl = (p.product_images as any[])
+      ?.sort((a: any, b: any) => a.sort_order - b.sort_order)?.[0]?.url
+      ?? null
+    return {
+      id: p.id,
+      name_en: p.name_en,
+      name_fa: p.name_fa,
+      slug: p.slug,
+      scale: p.scale,
+      notes: p.notes,
+      price: p.price,
+      firstImageUrl: imageUrl,
+    }
+  })
 
   return (
     <section
@@ -71,7 +60,7 @@ export default async function ProductsSection({
           <div className="mt-6 h-px w-16 bg-[#C9A84C] opacity-60" />
         </div>
 
-        <ProductsGrid products={products} dict={dict} locale={locale} />
+        <ProductsGrid products={gridProducts} dict={dict} locale={locale} />
       </div>
     </section>
   )
