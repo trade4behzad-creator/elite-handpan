@@ -14,6 +14,7 @@ type Accessory = {
   slug: string
   category: string | null
   price: number
+  price_fa: number | null
   description_en: string | null
   in_stock: boolean
   accessory_images: { url: string }[] | null
@@ -37,7 +38,7 @@ function AccessoriesSkeleton() {
 async function AccessoryList({ locale, dict }: { locale: string; dict: Dictionary }) {
   const { data: accessories } = await supabaseAdmin
     .from('accessories')
-    .select('id, name_en, name_fa, slug, category, price, description_en, in_stock, accessory_images(url)')
+    .select('id, name_en, name_fa, slug, category, price, price_fa, description_en, in_stock, accessory_images(url)')
     .order('created_at', { ascending: true })
 
   if (!accessories || accessories.length === 0) {
@@ -84,7 +85,9 @@ async function AccessoryList({ locale, dict }: { locale: string; dict: Dictionar
             </p>
             <div className="flex items-center justify-between">
               <span className="text-[#C9A84C] text-sm font-medium">
-                ${Number(item.price).toLocaleString()}
+                {locale === 'fa' && item.price_fa
+                  ? `${Number(item.price_fa).toLocaleString('en-US')} تومان`
+                  : `$${Number(item.price).toLocaleString()}`}
               </span>
               <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 group-hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px]">
                 {dict.products.cta}

@@ -135,8 +135,8 @@ export default function NewProductPage() {
             />
           </div>
 
-          {/* Scale + Notes + Price */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+          {/* Scale + Notes */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>گام (Scale)</label>
               <input name="scale" required placeholder="D Minor" style={{ ...inputStyle, direction: 'ltr' }} />
@@ -153,6 +153,10 @@ export default function NewProductPage() {
                 style={{ ...inputStyle, direction: 'ltr' }}
               />
             </div>
+          </div>
+
+          {/* Price USD + Price Toman */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
               <label style={labelStyle}>قیمت (دلار)</label>
               <input
@@ -162,6 +166,16 @@ export default function NewProductPage() {
                 min={0}
                 step="0.01"
                 placeholder="1400"
+                style={{ ...inputStyle, direction: 'ltr' }}
+              />
+            </div>
+            <div style={fieldStyle}>
+              <label style={labelStyle}>قیمت (تومان)</label>
+              <input
+                name="price_fa"
+                type="number"
+                min={0}
+                placeholder="58000000"
                 style={{ ...inputStyle, direction: 'ltr' }}
               />
             </div>

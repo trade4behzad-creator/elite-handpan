@@ -12,6 +12,7 @@ type Product = {
   scale: string
   notes: number
   price: number
+  price_fa: number | null
   description_en: string | null
   description_fa: string | null
   note_arrangement: string | null
@@ -135,7 +136,9 @@ export default function ProductDetail({
               className="text-3xl font-medium mb-6"
               style={{ color: '#C9A84C', fontFamily: 'var(--font-cormorant)' }}
             >
-              ${Number(product.price).toLocaleString()}
+              {locale === 'fa' && product.price_fa
+                ? `${Number(product.price_fa).toLocaleString('en-US')} تومان`
+                : `$${Number(product.price).toLocaleString()}`}
             </p>
 
             {/* Note arrangement badges */}
