@@ -11,7 +11,6 @@ type RawProduct = {
   scale: string
   notes: number
   price: number
-  product_images: { url: string }[] | null
 }
 
 export default async function ProductsSection({
@@ -21,13 +20,28 @@ export default async function ProductsSection({
   dict: Dictionary
   locale: string
 }) {
-  const { data } = await supabaseAdmin
+  const { data: rawProducts } = await supabaseAdmin
     .from('products')
-    .select('id, name_en, name_fa, slug, scale, notes, price, product_images(url)')
+    .select('id, name_en, name_fa, slug, scale, notes, price')
     .order('created_at', { ascending: true })
     .limit(6)
 
-  const products: GridProduct[] = ((data ?? []) as RawProduct[]).map((p) => ({
+  const productIds = (rawProducts ?? []).map((p) => p.id)
+
+  const { data: imageRows } = await supabaseAdmin
+    .from('product_images')
+    .select('product_id, url')
+    .in('product_id', productIds)
+    .order('sort_order', { ascending: true })
+
+  const firstImageMap = new Map<string, string>()
+  for (const row of imageRows ?? []) {
+    if (!firstImageMap.has(row.product_id)) {
+      firstImageMap.set(row.product_id, row.url)
+    }
+  }
+
+  const products: GridProduct[] = ((rawProducts ?? []) as RawProduct[]).map((p) => ({
     id: p.id,
     name_en: p.name_en,
     name_fa: p.name_fa,
@@ -35,7 +49,7 @@ export default async function ProductsSection({
     scale: p.scale,
     notes: p.notes,
     price: p.price,
-    firstImageUrl: p.product_images?.[0]?.url ?? null,
+    firstImageUrl: firstImageMap.get(p.id) ?? null,
   }))
 
   return (

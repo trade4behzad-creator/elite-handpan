@@ -60,7 +60,7 @@ const fieldStyle: React.CSSProperties = {
   flexDirection: 'column',
 }
 
-export type ProductImage = { id: string; url: string; order: number }
+export type ProductImage = { id: string; url: string; sort_order: number }
 
 export type Product = {
   id: string
@@ -97,6 +97,16 @@ export default function EditProductForm({
 
   const remainingSlots = Math.max(0, 3 - existingImages.length)
   const isSubmitting = uploading || isPending
+
+  async function refetchImages() {
+    const { data, error } = await supabase
+      .from('product_images')
+      .select('id, url, sort_order')
+      .eq('product_id', product.id)
+      .order('sort_order', { ascending: true })
+    if (error) console.error('refetchImages error:', error)
+    if (data) setExistingImages(data as ProductImage[])
+  }
 
   function handleDeleteImage(imageId: string, imageUrl: string) {
     setDeletingId(imageId)
@@ -147,7 +157,7 @@ export default function EditProductForm({
           return
         }
 
-        alert(`تصویر "${file.name}" با موفقیت آپلود شد`)
+        console.log(`تصویر "${file.name}" با موفقیت آپلود شد`)
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : String(err)
         setUploadError(`خطا در آپلود "${file.name}": ${msg}`)
@@ -156,6 +166,13 @@ export default function EditProductForm({
         return
       }
     }
+
+    // Refetch images so newly uploaded ones appear immediately
+    await refetchImages()
+    setSelectedFiles([])
+    setNewPreviews([])
+    const fileInput = document.getElementById('new-images-input') as HTMLInputElement
+    if (fileInput) fileInput.value = ''
 
     // Submit product fields via server action
     const formData = new FormData(formRef.current!)

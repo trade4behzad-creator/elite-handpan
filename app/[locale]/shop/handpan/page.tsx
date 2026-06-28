@@ -17,7 +17,6 @@ type Product = {
   price: number
   price_fa: number | null
   in_stock: boolean
-  product_images: { url: string }[] | null
 }
 
 function ProductsSkeleton() {
@@ -38,7 +37,7 @@ function ProductsSkeleton() {
 async function ProductList({ locale, dict }: { locale: string; dict: Dictionary }) {
   const { data: products } = await supabaseAdmin
     .from('products')
-    .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, in_stock, product_images(url)')
+    .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, in_stock')
     .order('created_at', { ascending: true })
 
   if (!products || products.length === 0) {
@@ -50,11 +49,26 @@ async function ProductList({ locale, dict }: { locale: string; dict: Dictionary 
     )
   }
 
+  // Fetch first image per product (separate query — no FK join needed)
+  const productIds = products.map((p) => p.id)
+  const { data: imageRows } = await supabaseAdmin
+    .from('product_images')
+    .select('product_id, url')
+    .in('product_id', productIds)
+    .order('sort_order', { ascending: true })
+
+  const firstImageMap = new Map<string, string>()
+  for (const row of imageRows ?? []) {
+    if (!firstImageMap.has(row.product_id)) {
+      firstImageMap.set(row.product_id, row.url)
+    }
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {(products as Product[]).map((product) => {
         const name = locale === 'fa' && product.name_fa ? product.name_fa : product.name_en
-        const img = product.product_images?.[0]?.url
+        const img = firstImageMap.get(product.id)
         return (
           <Link
             key={product.id}
