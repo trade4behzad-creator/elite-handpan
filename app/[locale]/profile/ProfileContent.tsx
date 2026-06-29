@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
+import Footer from '../../components/Footer'
 
 type Profile = {
   full_name: string | null
@@ -99,6 +100,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
   const displayPhone = profile?.phone ?? user?.user_metadata?.phone ?? null
 
   return (
+    <>
     <div className="pt-32 pb-24 max-w-4xl mx-auto px-8">
       <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-10">
         {/* Left: User info card */}
@@ -108,9 +110,8 @@ export default function ProfileContent({ locale }: { locale: string }) {
             <div
               className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-medium"
               style={{
-                background: '#C9A84C20',
-                color: '#C9A84C',
-                border: '1px solid #C9A84C40',
+                background: '#C9A84C',
+                color: '#000',
                 fontFamily: 'var(--font-inter)',
               }}
             >
@@ -178,20 +179,21 @@ export default function ProfileContent({ locale }: { locale: string }) {
           </h2>
 
           {orders.length === 0 ? (
-            <div className="py-16 text-center border border-gray-100 rounded-sm">
-              <p className="text-gray-400 text-sm mb-5" style={{ fontFamily: 'var(--font-inter)' }}>
-                {isFA ? 'هیچ سفارشی ثبت نشده' : 'No orders yet'}
+            <div className="py-16 text-center border border-gray-100 rounded-sm flex flex-col items-center gap-4">
+              <span style={{ color: '#C9A84C', fontSize: '2rem', lineHeight: 1 }}>◉</span>
+              <p className="text-gray-400 text-sm" style={{ fontFamily: 'var(--font-inter)' }}>
+                {isFA ? 'هنوز سفارشی ثبت نشده' : 'No orders yet'}
               </p>
               <Link
                 href={`/${locale}/shop/handpan`}
-                className="text-sm border px-5 py-2 rounded-sm transition-colors"
+                className="text-sm border px-5 py-2 rounded-sm transition-colors hover:bg-[#C9A84C]/5"
                 style={{
                   color: '#C9A84C',
                   borderColor: '#C9A84C40',
                   fontFamily: 'var(--font-inter)',
                 }}
               >
-                {isFA ? 'مشاهده محصولات' : 'Browse Products'}
+                {isFA ? 'مشاهده سازها' : 'Browse Instruments'}
               </Link>
             </div>
           ) : (
@@ -272,5 +274,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
         </div>
       </div>
     </div>
+    <Footer />
+  </>
   )
 }
