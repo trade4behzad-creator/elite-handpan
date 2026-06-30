@@ -13,7 +13,7 @@ export default async function AuthPage({
   const dict = await getDictionary(locale as 'en' | 'fa')
 
   return (
-    <div className="min-h-screen bg-[#080808] flex flex-col" dir={locale === 'fa' ? 'rtl' : 'ltr'}>
+    <div className="min-h-screen bg-white flex flex-col" dir={locale === 'fa' ? 'rtl' : 'ltr'}>
       <Navbar dict={dict} locale={locale} />
       <AuthForm locale={locale} />
     </div>
