@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scroll Frame Hero</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, "Segoe UI", Tahoma, sans-serif;
+  }
+
+  /* این کانتینر ارتفاعش رو تعیین می‌کنه که چقدر باید اسکرول کنی
+     تا انیمیشن کامل بشه. هرچی عدد بزرگتر، اسکرول کندتر پیش می‌ره. */
+  .hero-scroll-container {
+    position: relative;
+    height: 400vh; /* 4 برابر ارتفاع صفحه = فضای اسکرول */
+  }
+
+  /* این بخش وقتی تو viewport هست می‌چسبه و ثابت می‌مونه
+     تا زمانی که کانتینر بالا تموم بشه */
+  .hero-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: #0a0a0a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #hero-canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* نوار پیشرفت لود شدن فریم‌ها */
+  .loader {
+    position: absolute;
+    inset: 0;
+    background: #0a0a0a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    z-index: 10;
+    transition: opacity 0.4s ease;
+  }
+  .loader-bar-track {
+    width: 200px;
+    height: 2px;
+    background: rgba(255,255,255,0.2);
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .loader-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #fff;
+    transition: width 0.15s ease;
+  }
+  .loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* محتوای بعد از هیرو، فقط برای تست اسکرول */
+  .next-section {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f4f4;
+    font-size: 24px;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="hero-scroll-container">
+  <div class="hero-sticky">
+    <div class="loader" id="loader">
+      <div>در حال آماده‌سازی...</div>
+      <div class="loader-bar-track">
+        <div class="loader-bar-fill" id="loaderBarFill"></div>
+      </div>
+    </div>
+    <canvas id="hero-canvas"></canvas>
+  </div>
+</div>
+
+<div class="next-section">ادامه محتوای سایت اینجا میاد</div>
+
+<script>
+(function () {
+  // ---------- تنظیمات ----------
+  const FRAME_COUNT = 571;              // تعداد کل فریم‌ها
+  const FRAME_PATH_PREFIX = "frames/frame_"; // مسیر پوشه فریم‌ها
+  const FRAME_PATH_SUFFIX = ".jpg";     // پسوند فریم‌ها (jpg یا webp)
+  const FRAME_DIGITS = 3;               // چند رقمیه اسم فایل (frame_001 = 3 رقم)
+
+  const canvas = document.getElementById("hero-canvas");
+  const ctx = canvas.getContext("2d");
+  const loader = document.getElementById("loader");
+  const loaderBarFill = document.getElementById("loaderBarFill");
+  const scrollContainer = document.querySelector(".hero-scroll-container");
+
+  const images = new Array(FRAME_COUNT);
+  let loadedCount = 0;
+  let currentFrameIndex = 0;
+
+  function frameSrc(index) {
+    const num = String(index + 1).padStart(FRAME_DIGITS, "0");
+    return FRAME_PATH_PREFIX + num + FRAME_PATH_SUFFIX;
+  }
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    drawFrame(currentFrameIndex);
+  }
+
+  function drawFrame(index) {
+    const img = images[index];
+    if (!img || !img.complete || img.naturalWidth === 0) return;
+
+    const canvasRatio = canvas.width / canvas.height;
+    const imgRatio = img.naturalWidth / img.naturalHeight;
+    let drawWidth, drawHeight, offsetX, offsetY;
+
+    // شبیه object-fit: cover
+    if (imgRatio > canvasRatio) {
+      drawHeight = canvas.height;
+      drawWidth = drawHeight * imgRatio;
+      offsetX = (canvas.width - drawWidth) / 2;
+      offsetY = 0;
+    } else {
+      drawWidth = canvas.width;
+      drawHeight = drawWidth / imgRatio;
+      offsetX = 0;
+      offsetY = (canvas.height - drawHeight) / 2;
+    }
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+  }
+
+  function updateFrameFromScroll() {
+    const rect = scrollContainer.getBoundingClientRect();
+    const totalScrollable = scrollContainer.offsetHeight - window.innerHeight;
+    // چقدر از کانتینر اسکرول شده (0 تا 1)
+    let progress = -rect.top / totalScrollable;
+    progress = Math.min(Math.max(progress, 0), 1);
+
+    const frameIndex = Math.min(
+      FRAME_COUNT - 1,
+      Math.floor(progress * FRAME_COUNT)
+    );
+
+    if (frameIndex !== currentFrameIndex) {
+      currentFrameIndex = frameIndex;
+      drawFrame(currentFrameIndex);
+    }
+  }
+
+  // ---------- پیش‌بارگذاری فریم‌ها ----------
+  function preloadFrames() {
+    for (let i = 0; i < FRAME_COUNT; i++) {
+      const img = new Image();
+      img.onload = img.onerror = function () {
+        loadedCount++;
+        const percent = Math.round((loadedCount / FRAME_COUNT) * 100);
+        loaderBarFill.style.width = percent + "%";
+
+        // همین که چند فریم اول لود شد، اولین فریم رو نشون بده
+        if (loadedCount === 1) {
+          resizeCanvas();
+        }
+
+        if (loadedCount === FRAME_COUNT) {
+          loader.classList.add("hidden");
+        }
+      };
+      img.src = frameSrc(i);
+      images[i] = img;
+    }
+  }
+
+  // ---------- اجرا ----------
+  window.addEventListener("resize", resizeCanvas);
+  window.addEventListener("scroll", updateFrameFromScroll, { passive: true });
+
+  resizeCanvas();
+  preloadFrames();
+  updateFrameFromScroll();
+})();
+</script>
+
+</body>
+</html>
