@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
-const TOTAL_FRAMES = 336
+const TOTAL_FRAMES = 571
 const BATCH_SIZE = 20
 
 function drawCover(
@@ -171,7 +171,7 @@ export default function HeroSection({
 
       for (let i = start; i < end; i++) {
         const img = new Image()
-        img.src = `/frames/frame_${String(i + 1).padStart(4, '0')}.jpg`
+        img.src = `/frames/frame_${String(i + 1).padStart(3, '0')}.jpg`
         frames[i] = img
 
         const done = () => {
