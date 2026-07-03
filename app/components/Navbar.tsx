@@ -64,20 +64,20 @@ export default function Navbar({
   const closeMenu = () => setMenuOpen(false)
 
   const navBg = isHomepage
-    ? scrolled || menuOpen
-      ? 'bg-black/90 backdrop-blur-md'
-      : 'bg-transparent'
-    : 'bg-black/90 backdrop-blur-md'
+  ? scrolled || menuOpen
+    ? 'bg-black/40 backdrop-blur-sm'
+    : 'bg-transparent'
+  : 'bg-black/90 backdrop-blur-md'
 
   return (
     <nav
       ref={navRef}
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-500 ${navBg}`}
     >
-      <div className="flex items-center justify-between px-4 md:px-8 lg:px-16 py-3">
+      <div className="flex items-center justify-between px-4 md:px-8 lg:px-16 py-2">
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center">
-          <img src="/images/logo.png" alt="Elite Handpan" style={{ height: '100px', width: 'auto' }} />
+          <img src="/images/logo.png" alt="Elite Handpan" style={{ height: '44px', width: 'auto' }} />
         </Link>
 
         {/* Desktop nav */}
