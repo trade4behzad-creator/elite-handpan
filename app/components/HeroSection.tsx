@@ -11,15 +11,23 @@ function drawCover(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
   w: number,
-  h: number
+  h: number,
+  focusY: number = 0.5, // 0 = بالای عکس, 0.5 = وسط, 1 = پایین عکس
+  focusX: number = 0.5  // 0 = چپ عکس, 0.5 = وسط, 1 = راست عکس
 ) {
   const ia = img.naturalWidth / img.naturalHeight
   const ca = w / h
   let sx: number, sy: number, sw: number, sh: number
   if (ia > ca) {
-    sh = img.naturalHeight; sw = sh * ca; sx = (img.naturalWidth - sw) / 2; sy = 0
+    sh = img.naturalHeight
+    sw = sh * ca
+    sx = (img.naturalWidth - sw) * focusX
+    sy = 0
   } else {
-    sw = img.naturalWidth; sh = sw / ca; sx = 0; sy = (img.naturalHeight - sh) / 2
+    sw = img.naturalWidth
+    sh = sw / ca
+    sx = 0
+    sy = (img.naturalHeight - sh) * focusY
   }
   ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h)
 }
@@ -61,14 +69,17 @@ export default function HeroSection({
   const rafRef = useRef<number | null>(null)
 
   const drawFrame = useCallback((index: number) => {
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const img = framesRef.current[index]
-    if (!img?.complete || !img.naturalWidth) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    drawCover(ctx, img, canvas.width, canvas.height)
-  }, [])
+  const canvas = canvasRef.current
+  if (!canvas) return
+  const img = framesRef.current[index]
+  if (!img?.complete || !img.naturalWidth) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  const isMobileOrTablet = window.innerWidth < 1024
+  const focusY = isMobileOrTablet ? 0.2 : 0.5
+  const focusX = 0.24 // عدد کمتر از 0.5 یعنی بیشتر به سمت چپ تصویر
+  drawCover(ctx, img, canvas.width, canvas.height, focusY, focusX)
+}, [])
 
   // rAF loop lerps currentFrame → targetFrame and renders; scroll handler only sets targetFrame
   useEffect(() => {

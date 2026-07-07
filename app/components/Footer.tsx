@@ -152,6 +152,7 @@ export default async function Footer({ locale }: { locale: string }) {
                     src={post.image_url}
                     alt=""
                     fill
+                    sizes="(max-width: 768px) 33vw, 150px"
                     className="object-cover group-hover:opacity-80 transition-opacity"
                   />
                 </a>
