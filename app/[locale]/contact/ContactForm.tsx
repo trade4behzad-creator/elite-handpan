@@ -6,7 +6,7 @@ import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 type Status = 'idle' | 'loading' | 'success' | 'error'
 
 const inputClass =
-  'border border-gray-200 px-4 py-3 w-full focus:border-[#C9A84C] outline-none text-sm text-[#111] bg-white transition-colors'
+  'border border-gray-200 px-4 py-3 w-full focus:border-[#3F3E7A] outline-none text-sm text-[#111] bg-white transition-colors'
 
 const infoItems = [
   { icon: '◉', label: 'Email', value: 'info@elitehandpan.com', href: 'mailto:info@elitehandpan.com' },
@@ -82,7 +82,7 @@ export default function ContactForm() {
             </p>
             <button
               onClick={() => setStatus('idle')}
-              className="mt-4 text-xs tracking-widest uppercase text-[#C9A84C] border border-[#C9A84C] px-4 py-2 hover:bg-[#C9A84C] hover:text-black transition-colors"
+              className="mt-4 text-xs tracking-widest uppercase text-[#3F3E7A] border border-[#3F3E7A] px-4 py-2 hover:bg-[#3F3E7A] hover:text-black transition-colors"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
               Send another
@@ -160,7 +160,7 @@ export default function ContactForm() {
               <button
                 type="submit"
                 disabled={status === 'loading'}
-                className="w-full bg-[#C9A84C] hover:bg-[#b8943e] disabled:opacity-60 text-black text-sm tracking-widest uppercase py-4 transition-colors"
+                className="w-full bg-[#3F3E7A] hover:bg-[#b8943e] disabled:opacity-60 text-black text-sm tracking-widest uppercase py-4 transition-colors"
                 style={{ fontFamily: 'var(--font-inter)' }}
               >
                 {status === 'loading' ? 'Sending…' : 'Send Message'}
@@ -178,12 +178,12 @@ export default function ContactForm() {
         >
           Our Information
         </h2>
-        <div className="w-10 h-px bg-[#C9A84C] mt-2 mb-8" />
+        <div className="w-10 h-px bg-[#3F3E7A] mt-2 mb-8" />
 
         <ul className="flex flex-col gap-5 mb-10">
           {infoItems.map((item) => (
             <li key={item.label} className="flex items-start gap-3">
-              <span className="text-[#C9A84C] mt-0.5 text-sm">◉</span>
+              <span className="text-[#3F3E7A] mt-0.5 text-sm">◉</span>
               <div>
                 <p
                   className="text-xs text-gray-400 uppercase tracking-widest mb-0.5"
@@ -196,7 +196,7 @@ export default function ContactForm() {
                     href={item.href}
                     target={item.href.startsWith('http') ? '_blank' : undefined}
                     rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                    className="text-sm text-[#111] hover:text-[#C9A84C] transition-colors"
+                    className="text-sm text-[#111] hover:text-[#3F3E7A] transition-colors"
                     style={{ fontFamily: 'var(--font-inter)' }}
                   >
                     {item.value}

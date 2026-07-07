@@ -42,7 +42,7 @@ export default async function ShopPage({
             >
               Shop
             </h1>
-            <div className="mx-auto mt-4 w-16 h-px bg-[#C9A84C]" />
+            <div className="mx-auto mt-4 w-16 h-px bg-[#3F3E7A]" />
           </div>
 
           {/* Category cards */}
@@ -51,7 +51,7 @@ export default async function ShopPage({
               <Link
                 key={cat.slug}
                 href={`/${locale}/shop/${cat.slug}`}
-                className="group block bg-white border border-gray-200 hover:border-[#C9A84C] rounded-sm overflow-hidden transition-colors duration-300"
+                className="group block bg-white border border-gray-200 hover:border-[#3F3E7A] rounded-sm overflow-hidden transition-colors duration-300"
               >
                 <div className="aspect-[4/3] overflow-hidden">
                   <img

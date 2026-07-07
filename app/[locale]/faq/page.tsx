@@ -22,7 +22,7 @@ export default async function FaqPage({
         <div className="text-center pt-32 pb-16 px-8">
           <p
             className="text-xs tracking-widest uppercase mb-4"
-            style={{ color: '#C9A84C', fontFamily: 'var(--font-inter)' }}
+            style={{ color: '#3F3E7A', fontFamily: 'var(--font-inter)' }}
           >
             Support
           </p>
@@ -32,7 +32,7 @@ export default async function FaqPage({
           >
             Frequently Asked Questions
           </h1>
-          <div className="mx-auto mt-6 w-12 h-px bg-[#C9A84C]" />
+          <div className="mx-auto mt-6 w-12 h-px bg-[#3F3E7A]" />
         </div>
 
         <FaqAccordion />

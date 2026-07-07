@@ -36,7 +36,7 @@ function formatDate(iso: string) {
   })
 }
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 export default async function MessagesPage() {
   const { data: messages } = await supabaseAdmin
@@ -75,7 +75,7 @@ export default async function MessagesPage() {
               key={msg.id}
               style={{
                 background: '#111',
-                border: `1px solid ${msg.read ? '#1e1e1e' : '#C9A84C30'}`,
+                border: `1px solid ${msg.read ? '#1e1e1e' : '#3F3E7A30'}`,
                 borderRadius: '8px',
                 padding: '24px',
                 position: 'relative',

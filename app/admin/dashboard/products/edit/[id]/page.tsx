@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import EditProductForm, { type Product, type ProductImage } from './EditProductForm'
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 export default function EditProductPage() {
   const params = useParams<{ id: string }>()

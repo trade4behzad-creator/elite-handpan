@@ -21,7 +21,7 @@ export default async function ContactPage({
         {/* Page header */}
         <div className="max-w-6xl mx-auto px-8 pt-16 pb-0">
           <p
-            className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-4"
+            className="text-[#3F3E7A] text-xs tracking-[0.4em] uppercase mb-4"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             Get in Touch
@@ -32,7 +32,7 @@ export default async function ContactPage({
           >
             Contact Us
           </h1>
-          <div className="mt-6 h-px w-16 bg-[#C9A84C] opacity-60" />
+          <div className="mt-6 h-px w-16 bg-[#3F3E7A] opacity-60" />
         </div>
 
         <ContactForm />

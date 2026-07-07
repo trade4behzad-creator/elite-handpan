@@ -26,12 +26,12 @@ export default function Navbar({
 
   const desktopLinkClass = (segment: string) =>
     `text-sm tracking-wider transition-colors ${
-      isActive(segment) ? 'text-[#C9A84C]' : 'text-white/70 hover:text-white'
+      isActive(segment) ? 'text-[#3F3E7A]' : 'text-white/70 hover:text-white'
     }`
 
   const mobileLinkClass = (segment: string) =>
     `block w-full text-center text-lg py-4 hover:bg-white/5 transition-colors ${
-      isActive(segment) ? 'text-[#C9A84C]' : 'text-white'
+      isActive(segment) ? 'text-[#3F3E7A]' : 'text-white'
     }`
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function Navbar({
           <Link
             href={loggedIn ? `/${locale}/profile` : `/${locale}/auth`}
             title={loggedIn ? (locale === 'fa' ? 'پروفایل' : 'Profile') : (locale === 'fa' ? 'ورود' : 'Sign In')}
-            style={{ color: loggedIn ? '#C9A84C' : undefined }}
+            style={{ color: loggedIn ? '#3F3E7A' : undefined }}
             className={loggedIn ? '' : 'text-white/70 hover:text-white transition-colors'}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
@@ -144,7 +144,7 @@ export default function Navbar({
             href={loggedIn ? `/${locale}/profile` : `/${locale}/auth`}
             onClick={closeMenu}
             className="flex items-center justify-center py-4 hover:bg-white/5 transition-colors"
-            style={{ color: loggedIn ? '#C9A84C' : 'rgba(255,255,255,0.7)' }}
+            style={{ color: loggedIn ? '#3F3E7A' : 'rgba(255,255,255,0.7)' }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>

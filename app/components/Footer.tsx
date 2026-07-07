@@ -27,7 +27,7 @@ function YouTubeIcon() {
 }
 
 function GoldDivider() {
-  return <div className="w-10 h-[2px] bg-[#C9A84C] mt-1 mb-4" />
+  return <div className="w-10 h-[2px] bg-[#3F3E7A] mt-1 mb-4" />
 }
 
 export default async function Footer({ locale }: { locale: string }) {
@@ -80,7 +80,7 @@ export default async function Footer({ locale }: { locale: string }) {
                   key={label}
                   href={href}
                   aria-label={label}
-                  className="w-9 h-9 flex items-center justify-center rounded-full border border-white/40 text-white hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+                  className="w-9 h-9 flex items-center justify-center rounded-full border border-white/40 text-white hover:border-[#3F3E7A] hover:text-[#3F3E7A] transition-colors"
                 >
                   {icon}
                 </a>
@@ -94,12 +94,12 @@ export default async function Footer({ locale }: { locale: string }) {
             <GoldDivider />
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <a href="mailto:info@elitehandpan.com" className="hover:text-[#C9A84C] transition-colors">
+                <a href="mailto:info@elitehandpan.com" className="hover:text-[#3F3E7A] transition-colors">
                   info@elitehandpan.com
                 </a>
               </li>
               <li>
-                <a href="tel:+989000000000" className="hover:text-[#C9A84C] transition-colors">
+                <a href="tel:+989000000000" className="hover:text-[#3F3E7A] transition-colors">
                   +98 900 000 0000
                 </a>
               </li>
@@ -113,22 +113,22 @@ export default async function Footer({ locale }: { locale: string }) {
             <GoldDivider />
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href={`/${locale}/about`} className="hover:text-[#C9A84C] transition-colors">
+                <Link href={`/${locale}/about`} className="hover:text-[#3F3E7A] transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="#instruments" className="hover:text-[#C9A84C] transition-colors">
+                <Link href="#instruments" className="hover:text-[#3F3E7A] transition-colors">
                   Instruments
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/contact`} className="hover:text-[#C9A84C] transition-colors">
+                <Link href={`/${locale}/contact`} className="hover:text-[#3F3E7A] transition-colors">
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link href={`/${locale}/faq`} className="hover:text-[#C9A84C] transition-colors">
+                <Link href={`/${locale}/faq`} className="hover:text-[#3F3E7A] transition-colors">
                   FAQ
                 </Link>
               </li>
@@ -171,7 +171,7 @@ export default async function Footer({ locale }: { locale: string }) {
 
       {/* Bottom bar */}
       <div className="relative z-10">
-        <div className="w-full h-px bg-[#C9A84C]" />
+        <div className="w-full h-px bg-[#3F3E7A]" />
         <p className="text-center text-sm text-gray-500 py-5">
           Copyrights 2026 © Elite Handpan. All rights reserved.
         </p>

@@ -13,7 +13,7 @@ type Order = {
   customer_phone: string | null
 }
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 const STATUS_COLORS: Record<string, { bg: string; text: string }> = {
   pending:   { bg: 'rgba(245,158,11,0.1)',  text: '#f59e0b' },

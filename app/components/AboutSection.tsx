@@ -19,7 +19,7 @@ export default function AboutSection({ locale }: { locale: string }) {
           className="order-2 md:order-1 flex flex-col gap-6"
         >
           <p
-            className="text-[#C9A84C] tracking-widest text-xs uppercase"
+            className="text-[#3F3E7A] tracking-widest text-xs uppercase"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             OUR STORY
@@ -40,7 +40,7 @@ export default function AboutSection({ locale }: { locale: string }) {
           </p>
           <Link
             href={`/${locale}/about`}
-            className="self-start border border-[#C9A84C] text-[#C9A84C] text-sm tracking-wider px-6 py-3 transition-all duration-300 hover:bg-[#C9A84C] hover:text-white"
+            className="self-start border border-[#3F3E7A] text-[#3F3E7A] text-sm tracking-wider px-6 py-3 transition-all duration-300 hover:bg-[#3F3E7A] hover:text-white"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             Discover Our Story

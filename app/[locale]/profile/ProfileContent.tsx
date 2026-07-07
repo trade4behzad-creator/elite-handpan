@@ -114,7 +114,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
         />
         <div className="absolute bottom-6 left-0 right-0 px-8 max-w-4xl mx-auto">
           <p
-            className="text-[#C9A84C] text-xs tracking-widest uppercase mb-1"
+            className="text-[#3F3E7A] text-xs tracking-widest uppercase mb-1"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             ELITE HANDPAN
@@ -137,7 +137,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-medium ring-4 ring-white"
                 style={{
-                  background: '#C9A84C',
+                  background: '#3F3E7A',
                   color: '#000',
                   fontFamily: 'var(--font-inter)',
                 }}
@@ -177,8 +177,8 @@ export default function ProfileContent({ locale }: { locale: string }) {
                 className="w-full py-2 text-sm tracking-wide border rounded-sm transition-colors"
                 style={{
                   fontFamily: 'var(--font-inter)',
-                  color: '#C9A84C',
-                  borderColor: '#C9A84C',
+                  color: '#3F3E7A',
+                  borderColor: '#3F3E7A',
                   background: 'transparent',
                   cursor: 'pointer',
                 }}
@@ -207,16 +207,16 @@ export default function ProfileContent({ locale }: { locale: string }) {
 
             {orders.length === 0 ? (
               <div className="py-16 text-center border border-gray-100 rounded-sm flex flex-col items-center gap-4">
-                <span style={{ color: '#C9A84C', fontSize: '2rem', lineHeight: 1 }}>◉</span>
+                <span style={{ color: '#3F3E7A', fontSize: '2rem', lineHeight: 1 }}>◉</span>
                 <p className="text-gray-400 text-sm" style={{ fontFamily: 'var(--font-inter)' }}>
                   {isFA ? 'هنوز سفارشی ثبت نشده' : 'No orders yet'}
                 </p>
                 <Link
                   href={`/${locale}/shop/handpan`}
-                  className="text-sm border px-5 py-2 rounded-sm transition-colors hover:bg-[#C9A84C]/5"
+                  className="text-sm border px-5 py-2 rounded-sm transition-colors hover:bg-[#3F3E7A]/5"
                   style={{
-                    color: '#C9A84C',
-                    borderColor: '#C9A84C40',
+                    color: '#3F3E7A',
+                    borderColor: '#3F3E7A40',
                     fontFamily: 'var(--font-inter)',
                   }}
                 >
@@ -265,7 +265,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
                             {STAGES.map((s) => (
                               <span
                                 key={s}
-                                style={{ color: STATUS_LABELS[s].stage <= statusInfo.stage ? '#C9A84C' : undefined }}
+                                style={{ color: STATUS_LABELS[s].stage <= statusInfo.stage ? '#3F3E7A' : undefined }}
                               >
                                 {isFA ? STATUS_LABELS[s].fa : STATUS_LABELS[s].en}
                               </span>
@@ -274,7 +274,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
                           <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
                             <div
                               className="h-full rounded-full transition-all duration-500"
-                              style={{ width: `${progressPct}%`, background: '#C9A84C' }}
+                              style={{ width: `${progressPct}%`, background: '#3F3E7A' }}
                             />
                           </div>
                         </div>
@@ -286,7 +286,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
                           <p className="text-xs text-gray-400 mb-1" style={{ fontFamily: 'var(--font-inter)' }}>
                             {isFA ? 'مبلغ' : 'Amount'}
                           </p>
-                          <p className="text-sm font-medium" style={{ color: '#C9A84C', fontFamily: 'var(--font-inter)' }}>
+                          <p className="text-sm font-medium" style={{ color: '#3F3E7A', fontFamily: 'var(--font-inter)' }}>
                             {isFA && order.total_fa
                               ? `${Number(order.total_fa).toLocaleString('en-US')} تومان`
                               : `$${Number(order.total_usd).toLocaleString()}`}

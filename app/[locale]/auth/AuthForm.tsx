@@ -9,7 +9,7 @@ function formatPhone(phone: string) {
 }
 
 const inputClass =
-  'w-full bg-[#fafafa] border border-gray-200 text-[#111] px-4 py-3 text-sm focus:outline-none focus:border-[#C9A84C] transition-colors rounded-[3px]'
+  'w-full bg-[#fafafa] border border-gray-200 text-[#111] px-4 py-3 text-sm focus:outline-none focus:border-[#3F3E7A] transition-colors rounded-[3px]'
 
 export default function AuthForm({ locale }: { locale: string }) {
   const router = useRouter()
@@ -113,7 +113,7 @@ export default function AuthForm({ locale }: { locale: string }) {
           </div>
 
           <p
-            className="text-[#C9A84C] text-xs tracking-widest uppercase text-center mb-3"
+            className="text-[#3F3E7A] text-xs tracking-widest uppercase text-center mb-3"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             ELITE HANDPAN
@@ -136,7 +136,7 @@ export default function AuthForm({ locale }: { locale: string }) {
               : (isFA ? 'به جمع علاقه‌مندان الیت بپیوندید' : 'Join the Elite collectors circle')}
           </p>
 
-          <div className="mb-7 h-px w-12 bg-[#C9A84C] opacity-60 mx-auto" />
+          <div className="mb-7 h-px w-12 bg-[#3F3E7A] opacity-60 mx-auto" />
 
           {error && (
             <div
@@ -216,7 +216,7 @@ export default function AuthForm({ locale }: { locale: string }) {
               disabled={loading}
               className="mt-2 w-full py-3 rounded-sm text-sm tracking-widest uppercase transition-opacity"
               style={{
-                background: loading ? '#b8973e' : '#C9A84C',
+                background: loading ? '#b8973e' : '#3F3E7A',
                 color: '#000',
                 fontFamily: 'var(--font-inter)',
                 fontWeight: 600,
@@ -233,7 +233,7 @@ export default function AuthForm({ locale }: { locale: string }) {
           <button
             type="button"
             onClick={switchMode}
-            className="mt-6 w-full text-center text-sm text-gray-400 hover:text-[#C9A84C] transition-colors"
+            className="mt-6 w-full text-center text-sm text-gray-400 hover:text-[#3F3E7A] transition-colors"
             style={{ fontFamily: 'var(--font-inter)', background: 'none', border: 'none', cursor: 'pointer' }}
           >
             {mode === 'login'

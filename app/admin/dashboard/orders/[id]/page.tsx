@@ -27,7 +27,7 @@ type OrderItem = {
   price_fa: number | null
 }
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 const STATUSES = [
   { value: 'pending',   label: 'در انتظار' },

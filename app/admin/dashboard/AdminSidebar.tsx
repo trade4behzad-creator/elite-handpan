@@ -36,7 +36,7 @@ export default function AdminSidebar() {
       >
         <p
           style={{
-            color: '#C9A84C',
+            color: '#3F3E7A',
             fontSize: '10px',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
@@ -66,9 +66,9 @@ export default function AdminSidebar() {
                 alignItems: 'center',
                 gap: '12px',
                 padding: '11px 24px',
-                color: isActive ? '#C9A84C' : '#888',
+                color: isActive ? '#3F3E7A' : '#888',
                 background: isActive ? 'rgba(201,168,76,0.07)' : 'transparent',
-                borderRight: isActive ? '2px solid #C9A84C' : '2px solid transparent',
+                borderRight: isActive ? '2px solid #3F3E7A' : '2px solid transparent',
                 textDecoration: 'none',
                 fontSize: '14px',
                 transition: 'all 0.15s',

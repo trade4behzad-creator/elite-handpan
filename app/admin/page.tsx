@@ -50,7 +50,7 @@ export default async function AdminLoginPage({
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <p
             style={{
-              color: '#C9A84C',
+              color: '#3F3E7A',
               fontSize: '11px',
               letterSpacing: '0.3em',
               textTransform: 'uppercase',
@@ -73,7 +73,7 @@ export default async function AdminLoginPage({
             style={{
               width: '40px',
               height: '1px',
-              background: '#C9A84C',
+              background: '#3F3E7A',
               margin: '20px auto 0',
               opacity: 0.6,
             }}
@@ -137,7 +137,7 @@ export default async function AdminLoginPage({
             style={{
               width: '100%',
               padding: '13px',
-              background: '#C9A84C',
+              background: '#3F3E7A',
               color: '#0a0a0a',
               border: 'none',
               borderRadius: '4px',

@@ -51,7 +51,7 @@ export default async function AboutPage({
         <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
           <p
             className="text-xs tracking-[0.4em] uppercase mb-4"
-            style={{ color: '#C9A84C', fontFamily: 'var(--font-inter)' }}
+            style={{ color: '#3F3E7A', fontFamily: 'var(--font-inter)' }}
           >
             {c.eyebrow}
           </p>
@@ -97,7 +97,7 @@ export default async function AboutPage({
             <div key={stat.value}>
               <p
                 className="text-4xl md:text-5xl font-light mb-2"
-                style={{ color: '#C9A84C', fontFamily: 'var(--font-cormorant)' }}
+                style={{ color: '#3F3E7A', fontFamily: 'var(--font-cormorant)' }}
               >
                 {stat.value}
               </p>

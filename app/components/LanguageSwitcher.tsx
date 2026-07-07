@@ -17,7 +17,7 @@ export default function LanguageSwitcher({ locale }: { locale: string }) {
         onClick={() => switchLocale('en')}
         className={`transition-colors ${
           locale === 'en'
-            ? 'text-[#C9A84C]'
+            ? 'text-[#3F3E7A]'
             : 'text-white/50 hover:text-white'
         }`}
       >
@@ -28,7 +28,7 @@ export default function LanguageSwitcher({ locale }: { locale: string }) {
         onClick={() => switchLocale('fa')}
         className={`transition-colors ${
           locale === 'fa'
-            ? 'text-[#C9A84C]'
+            ? 'text-[#3F3E7A]'
             : 'text-white/50 hover:text-white'
         }`}
       >

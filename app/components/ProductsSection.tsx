@@ -46,7 +46,7 @@ export default async function ProductsSection({
         {/* Section heading — keep the motion animation here as a client island */}
         <div className="mb-16">
           <p
-            className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-4"
+            className="text-[#3F3E7A] text-xs tracking-[0.4em] uppercase mb-4"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             {locale === 'fa' ? 'کلکسیون' : 'Collection'}
@@ -57,7 +57,7 @@ export default async function ProductsSection({
           >
             {dict.products.heading}
           </h2>
-          <div className="mt-6 h-px w-16 bg-[#C9A84C] opacity-60" />
+          <div className="mt-6 h-px w-16 bg-[#3F3E7A] opacity-60" />
         </div>
 
         <ProductsGrid products={gridProducts} dict={dict} locale={locale} />

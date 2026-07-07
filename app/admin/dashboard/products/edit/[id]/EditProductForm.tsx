@@ -4,7 +4,7 @@ import { useState, useTransition, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { updateProduct, deleteProductImage } from '../../actions'
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 const BUCKET = 'product-images'
 
 async function uploadImage(file: File, slug: string): Promise<string> {

@@ -62,9 +62,9 @@ export default function AccessoryDetail({
         {/* Breadcrumb */}
         <div className="max-w-6xl mx-auto px-8 pt-32 pb-0">
           <p className="text-xs text-gray-400 tracking-wide" style={{ fontFamily: 'var(--font-inter)' }}>
-            <Link href={`/${locale}/shop`} className="hover:text-[#C9A84C] transition-colors">Shop</Link>
+            <Link href={`/${locale}/shop`} className="hover:text-[#3F3E7A] transition-colors">Shop</Link>
             {' › '}
-            <Link href={`/${locale}/shop/accessory`} className="hover:text-[#C9A84C] transition-colors">Accessories</Link>
+            <Link href={`/${locale}/shop/accessory`} className="hover:text-[#3F3E7A] transition-colors">Accessories</Link>
             {' › '}
             <span className="text-gray-600">{name}</span>
           </p>
@@ -94,7 +94,7 @@ export default function AccessoryDetail({
                     type="button"
                     onClick={() => setActiveImage(i)}
                     className={`aspect-square bg-[#f5f5f5] rounded-sm overflow-hidden flex items-center justify-center p-3 border-2 transition-colors ${
-                      activeImage === i ? 'border-[#C9A84C]' : 'border-transparent hover:border-gray-300'
+                      activeImage === i ? 'border-[#3F3E7A]' : 'border-transparent hover:border-gray-300'
                     }`}
                   >
                     <img
@@ -111,7 +111,7 @@ export default function AccessoryDetail({
           {/* Accessory info */}
           <div className="flex flex-col">
             <p
-              className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-3"
+              className="text-[#3F3E7A] text-xs tracking-[0.4em] uppercase mb-3"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
               {accessory.category ?? 'Accessory'}
@@ -122,7 +122,7 @@ export default function AccessoryDetail({
             >
               {name}
             </h1>
-            <div className="w-12 h-px bg-[#C9A84C] my-6" />
+            <div className="w-12 h-px bg-[#3F3E7A] my-6" />
             {description && (
               <p className="text-gray-600 leading-relaxed mb-6" style={{ fontFamily: 'var(--font-inter)' }}>
                 {description}
@@ -130,7 +130,7 @@ export default function AccessoryDetail({
             )}
             <p
               className="text-3xl font-medium mb-8"
-              style={{ color: '#C9A84C', fontFamily: 'var(--font-cormorant)' }}
+              style={{ color: '#3F3E7A', fontFamily: 'var(--font-cormorant)' }}
             >
               ${Number(accessory.price).toLocaleString()}
             </p>
@@ -139,7 +139,7 @@ export default function AccessoryDetail({
               href="https://wa.me/989000000000"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-[#C9A84C] hover:bg-[#b8943e] text-black text-sm tracking-widest uppercase py-4 text-center transition-colors font-medium"
+              className="w-full bg-[#3F3E7A] hover:bg-[#b8943e] text-black text-sm tracking-widest uppercase py-4 text-center transition-colors font-medium"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
               {dict.products.cta}
@@ -155,7 +155,7 @@ export default function AccessoryDetail({
           >
             Specifications
           </h2>
-          <div className="w-12 h-px bg-[#C9A84C] mb-6" />
+          <div className="w-12 h-px bg-[#3F3E7A] mb-6" />
           <div className="border border-gray-100 rounded-sm overflow-hidden">
             {Object.entries(specs).map(([key, value], i) => (
               <div key={key} className={`grid grid-cols-2 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
@@ -176,7 +176,7 @@ export default function AccessoryDetail({
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
           {features.map((f) => (
             <div key={f.title} className="bg-white p-8 rounded-sm border border-gray-100">
-              <p className="text-[#C9A84C] text-xl mb-4">✦</p>
+              <p className="text-[#3F3E7A] text-xl mb-4">✦</p>
               <h3 className="text-lg font-semibold text-[#111111] mb-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
                 {f.title}
               </h3>

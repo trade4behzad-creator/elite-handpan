@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useFormStatus } from 'react-dom'
 import { updateInstagramPost } from '../../actions'
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',

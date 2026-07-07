@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
       subject: `[Elite Handpan] ${subject} — from ${name}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-          <h2 style="color:#C9A84C;border-bottom:1px solid #eee;padding-bottom:12px">
+          <h2 style="color:#3F3E7A;border-bottom:1px solid #eee;padding-bottom:12px">
             New Contact Form Submission
           </h2>
           <table style="width:100%;border-collapse:collapse">
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
           </table>
           <div style="margin-top:20px">
             <p style="color:#666;margin-bottom:8px">Message:</p>
-            <div style="background:#f9f9f9;padding:16px;border-left:3px solid #C9A84C;white-space:pre-wrap">${message}</div>
+            <div style="background:#f9f9f9;padding:16px;border-left:3px solid #3F3E7A;white-space:pre-wrap">${message}</div>
           </div>
         </div>
       `,

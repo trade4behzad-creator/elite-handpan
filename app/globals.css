@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --color-gold: #C9A84C;
+  --color-gold: #3F3E7A;
   --color-surface: #f5f5f5;
   --color-page: #ffffff;
   --color-muted: #888888;

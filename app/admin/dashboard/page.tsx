@@ -13,7 +13,7 @@ async function getStats() {
   return { products: products ?? 0, messages: messages ?? 0, unread: unread ?? 0 }
 }
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 export default async function DashboardPage() {
   const stats = await getStats()

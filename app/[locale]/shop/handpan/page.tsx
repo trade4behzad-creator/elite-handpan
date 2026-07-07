@@ -68,7 +68,7 @@ async function ProductList({ locale, dict }: { locale: string; dict: Dictionary 
           <Link
             key={product.id}
             href={`/${locale}/shop/handpan/${product.slug}`}
-            className="group block bg-white border border-gray-200 hover:border-[#C9A84C]/60 transition-all duration-300 rounded-[4px] overflow-hidden p-6"
+            className="group block bg-white border border-gray-200 hover:border-[#3F3E7A]/60 transition-all duration-300 rounded-[4px] overflow-hidden p-6"
           >
             <div className="aspect-square bg-[#f5f5f5] flex items-center justify-center rounded-sm overflow-hidden mb-5 p-4">
               <img src={firstImage} alt={name} className="w-full h-full object-contain mix-blend-multiply" />
@@ -86,12 +86,12 @@ async function ProductList({ locale, dict }: { locale: string; dict: Dictionary 
               {product.scale} · {product.notes} {dict.products.notes}
             </p>
             <div className="flex items-center justify-between">
-              <span className="text-[#C9A84C] text-sm font-medium">
+              <span className="text-[#3F3E7A] text-sm font-medium">
                 {locale === 'fa' && product.price_fa
                   ? `${Number(product.price_fa).toLocaleString('en-US')} تومان`
                   : `$${Number(product.price).toLocaleString()}`}
               </span>
-              <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#C9A84C] transition-colors uppercase border border-gray-200 group-hover:border-[#C9A84C]/60 px-3 py-1.5 rounded-[2px]">
+              <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#3F3E7A] transition-colors uppercase border border-gray-200 group-hover:border-[#3F3E7A]/60 px-3 py-1.5 rounded-[2px]">
                 {dict.products.cta}
               </span>
             </div>
@@ -118,7 +118,7 @@ export default async function ShopHandpanPage({
         <div className="max-w-6xl mx-auto">
           <div className="mb-16">
             <p
-              className="text-[#C9A84C] text-xs tracking-[0.4em] uppercase mb-4"
+              className="text-[#3F3E7A] text-xs tracking-[0.4em] uppercase mb-4"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
               Collection
@@ -129,7 +129,7 @@ export default async function ShopHandpanPage({
             >
               Handpan
             </h1>
-            <div className="mt-6 h-px w-16 bg-[#C9A84C] opacity-60" />
+            <div className="mt-6 h-px w-16 bg-[#3F3E7A] opacity-60" />
           </div>
           <Suspense fallback={<ProductsSkeleton />}>
             <ProductList locale={locale} dict={dict} />

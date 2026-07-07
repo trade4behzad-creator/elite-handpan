@@ -1,4 +1,4 @@
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 export default function SettingsPage() {
   return (

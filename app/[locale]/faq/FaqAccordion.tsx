@@ -65,7 +65,7 @@ export default function FaqAccordion() {
             </span>
             <span
               className="text-xl shrink-0 transition-transform duration-200"
-              style={{ color: '#C9A84C' }}
+              style={{ color: '#3F3E7A' }}
             >
               {openIndex === i ? '−' : '+'}
             </span>

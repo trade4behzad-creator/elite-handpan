@@ -69,18 +69,26 @@ export default function HeroSection({
   const rafRef = useRef<number | null>(null)
   const sectionMetrics = useRef({ top: 0, height: 0 })
 
+  // Force page to start scrolled to top on refresh, instead of browser scroll restoration
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+    window.scrollTo(0, 0)
+  }, [])
+
   const drawFrame = useCallback((index: number) => {
-  const canvas = canvasRef.current
-  if (!canvas) return
-  const img = framesRef.current[index]
-  if (!img?.complete || !img.naturalWidth) return
-  const ctx = canvas.getContext('2d')
-  if (!ctx) return
-  const isMobileOrTablet = window.innerWidth < 1024
-  const focusY = isMobileOrTablet ? 0.2 : 0.5
-  const focusX = 0.24 // عدد کمتر از 0.5 یعنی بیشتر به سمت چپ تصویر
-  drawCover(ctx, img, canvas.width, canvas.height, focusY, focusX)
-}, [])
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const img = framesRef.current[index]
+    if (!img?.complete || !img.naturalWidth) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const isMobileOrTablet = window.innerWidth < 1024
+    const focusY = isMobileOrTablet ? 0.2 : 0.5
+    const focusX = 0.24 // عدد کمتر از 0.5 یعنی بیشتر به سمت چپ تصویر
+    drawCover(ctx, img, canvas.width, canvas.height, focusY, focusX)
+  }, [])
 
   // rAF loop lerps currentFrame → targetFrame and renders; scroll handler only sets targetFrame
   useEffect(() => {
@@ -108,6 +116,7 @@ export default function HeroSection({
       }
     }
     updateMetrics()
+
     const handleScroll = () => {
       const sectionTop = sectionMetrics.current.top
       const sectionHeight = sectionMetrics.current.height
@@ -129,7 +138,7 @@ export default function HeroSection({
 
       if (textRef.current) {
         textRef.current.style.opacity = String(Math.max(0, 1 - progress / 0.3))
-      } 
+      }
       if (scrollHintRef.current) {
         scrollHintRef.current.style.opacity = String(Math.max(0, 1 - progress / 0.05))
       }
@@ -167,16 +176,7 @@ export default function HeroSection({
       setSize()
       const section = sectionRef.current
       if (!section) return
-      const handleResize = () => {
-        setSize()
-        const section = sectionRef.current
-        if (!section) return
-        sectionMetrics.current = { top: section.offsetTop, height: section.offsetHeight }  // ← این خط جدیده
-        const vh = window.innerHeight
-        const switchPoint = section.offsetTop + section.offsetHeight - vh
-        const p = Math.max(0, Math.min(1, (window.scrollY - section.offsetTop) / (switchPoint - section.offsetTop)))
-        drawFrame(Math.min(Math.floor(p * TOTAL_FRAMES), TOTAL_FRAMES - 1))
-      }
+      sectionMetrics.current = { top: section.offsetTop, height: section.offsetHeight }
       const vh = window.innerHeight
       const switchPoint = section.offsetTop + section.offsetHeight - vh
       const p = Math.max(0, Math.min(1, (window.scrollY - section.offsetTop) / (switchPoint - section.offsetTop)))
@@ -250,9 +250,6 @@ export default function HeroSection({
           pointerEvents: 'none',
         }}
       >
-        {/* Dark tint for text contrast */}
-        
-
         {/* Loading bar along bottom edge */}
         {!allLoaded && (
           <div
@@ -260,12 +257,11 @@ export default function HeroSection({
             style={{ zIndex: 20 }}
           >
             <div
-              className="h-full bg-[#C9A84C] transition-[width] duration-150"
+              className="h-full bg-[#3F3E7A] transition-[width] duration-150"
               style={{ width: `${loadProgress * 100}%` }}
             />
           </div>
         )}
-
 
         {/* Hero text */}
         <div
@@ -273,7 +269,7 @@ export default function HeroSection({
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-4"
         >
           <p
-            className="text-[#C9A84C] tracking-[0.35em] text-xs uppercase mb-6"
+            className="text-[#3F3E7A] tracking-[0.35em] text-xs uppercase mb-6"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
             {dict.hero.eyebrow}

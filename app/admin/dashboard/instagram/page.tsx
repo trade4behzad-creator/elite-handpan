@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { supabaseAdmin } from '../../../../lib/supabase-admin'
 import { deleteInstagramPost } from './actions'
 
-const GOLD = '#C9A84C'
+const GOLD = '#3F3E7A'
 
 export default async function InstagramListPage() {
   const { data: posts } = await supabaseAdmin
