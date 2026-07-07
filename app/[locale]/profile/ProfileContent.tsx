@@ -301,7 +301,7 @@ export default function ProfileContent({ locale }: { locale: string }) {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

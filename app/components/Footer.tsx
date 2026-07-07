@@ -1,7 +1,6 @@
-'use client'
-
 import Image from 'next/image'
 import Link from 'next/link'
+import { supabaseAdmin } from '../../lib/supabase-admin'
 
 function TwitterIcon() {
   return (
@@ -31,8 +30,21 @@ function GoldDivider() {
   return <div className="w-10 h-[2px] bg-[#C9A84C] mt-1 mb-4" />
 }
 
-export default function Footer() {
-  const instagramPlaceholders = Array.from({ length: 6 })
+export default async function Footer({ locale }: { locale: string }) {
+  const { data: instagramPosts } = await supabaseAdmin
+    .from('instagram_posts')
+    .select('*')
+    .order('order', { ascending: true })
+    .limit(6)
+
+  const posts = instagramPosts ?? []
+  const emptySlots = Math.max(0, 6 - posts.length)
+
+  const socialLinks = [
+    { icon: <TwitterIcon />, label: 'Twitter', href: '#' },
+    { icon: <InstagramIcon />, label: 'Instagram', href: '#' },
+    { icon: <YouTubeIcon />, label: 'YouTube', href: '#' },
+  ]
 
   return (
     <footer id="contact" className="relative bg-[#0d0d0d] text-white overflow-hidden">
@@ -63,11 +75,7 @@ export default function Footer() {
             />
             <p className="mt-3 text-lg font-semibold tracking-[0.25em] uppercase">ELITE</p>
             <div className="flex gap-3 mt-5">
-              {[
-                { icon: <TwitterIcon />, label: 'Twitter', href: '#' },
-                { icon: <InstagramIcon />, label: 'Instagram', href: '#' },
-                { icon: <YouTubeIcon />, label: 'YouTube', href: '#' },
-              ].map(({ icon, label, href }) => (
+              {socialLinks.map(({ icon, label, href }) => (
                 <a
                   key={label}
                   href={href}
@@ -105,16 +113,24 @@ export default function Footer() {
             <GoldDivider />
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <Link href="/en/about" className="hover:text-[#C9A84C] transition-colors">About Us</Link>
+                <Link href={`/${locale}/about`} className="hover:text-[#C9A84C] transition-colors">
+                  About Us
+                </Link>
               </li>
               <li>
-                <Link href="#instruments" className="hover:text-[#C9A84C] transition-colors">Instruments</Link>
+                <Link href="#instruments" className="hover:text-[#C9A84C] transition-colors">
+                  Instruments
+                </Link>
               </li>
               <li>
-                <Link href="#contact" className="hover:text-[#C9A84C] transition-colors">Contact Us</Link>
+                <Link href={`/${locale}/contact`} className="hover:text-[#C9A84C] transition-colors">
+                  Contact Us
+                </Link>
               </li>
               <li>
-                <Link href="/en/faq" className="hover:text-[#C9A84C] transition-colors">FAQ</Link>
+                <Link href={`/${locale}/faq`} className="hover:text-[#C9A84C] transition-colors">
+                  FAQ
+                </Link>
               </li>
             </ul>
           </div>
@@ -124,10 +140,26 @@ export default function Footer() {
             <h3 className="text-base font-semibold">Instagram</h3>
             <GoldDivider />
             <div className="grid grid-cols-3 gap-1.5">
-              {instagramPlaceholders.map((_, i) => (
+              {posts.map((post) => (
+                <a
+                  key={post.id}
+                  href={post.post_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="aspect-square block relative overflow-hidden rounded-sm group"
+                >
+                  <Image
+                    src={post.image_url}
+                    alt=""
+                    fill
+                    className="object-cover group-hover:opacity-80 transition-opacity"
+                  />
+                </a>
+              ))}
+              {Array.from({ length: emptySlots }).map((_, i) => (
                 <div
-                  key={i}
-                  className="aspect-square bg-[#2a2a2a] hover:opacity-80 transition-opacity cursor-pointer rounded-sm"
+                  key={`empty-${i}`}
+                  className="aspect-square bg-[#2a2a2a] rounded-sm"
                 />
               ))}
             </div>

@@ -134,7 +134,7 @@ export default async function ShopAccessoryPage({
           </Suspense>
         </div>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

@@ -23,7 +23,7 @@ export default async function LocalePage({
       <HeroSection dict={dict} locale={locale} />
       <AboutSection locale={locale} />
       <ProductsSection dict={dict} locale={locale} />
-      <Footer />
+      <Footer locale={locale} />
     </main>
   )
 }

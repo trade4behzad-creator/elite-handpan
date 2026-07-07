@@ -112,7 +112,7 @@ export default async function AboutPage({
         </div>
       </section>
 
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

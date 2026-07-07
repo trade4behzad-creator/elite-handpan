@@ -34,7 +34,7 @@ export default async function AccessoryPage({
     <>
       <Navbar dict={dict} locale={locale} />
       <AccessoryDetail accessory={accessory} images={images} locale={locale} dict={dict} />
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

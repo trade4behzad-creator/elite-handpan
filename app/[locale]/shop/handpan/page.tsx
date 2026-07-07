@@ -136,7 +136,7 @@ export default async function ShopHandpanPage({
           </Suspense>
         </div>
       </main>
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

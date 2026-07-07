@@ -34,7 +34,7 @@ export default async function ProductPage({
     <>
       <Navbar dict={dict} locale={locale} />
       <ProductDetail product={product} images={images} locale={locale} dict={dict} />
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

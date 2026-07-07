@@ -80,7 +80,7 @@ export default async function ShopPage({
         </div>
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

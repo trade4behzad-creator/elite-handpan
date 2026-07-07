@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
-const TOTAL_FRAMES = 91
+const TOTAL_FRAMES = 304
 const BATCH_SIZE = 20
 
 function drawCover(
@@ -51,7 +51,6 @@ export default function HeroSection({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const overlayRef = useRef<HTMLDivElement>(null)
   const textRef = useRef<HTMLDivElement>(null)
-  const lineRef = useRef<HTMLDivElement>(null)
   const scrollHintRef = useRef<HTMLDivElement>(null)
   const framesRef = useRef<HTMLImageElement[]>([])
   const [loadProgress, setLoadProgress] = useState(0)
@@ -111,11 +110,7 @@ export default function HeroSection({
 
       if (textRef.current) {
         textRef.current.style.opacity = String(Math.max(0, 1 - progress / 0.3))
-      }
-      if (lineRef.current) {
-        const lp = Math.max(0, Math.min(1, (progress - 0.45) / 0.27))
-        lineRef.current.style.transform = `scaleX(${lp})`
-      }
+      } 
       if (scrollHintRef.current) {
         scrollHintRef.current.style.opacity = String(Math.max(0, 1 - progress / 0.05))
       }
@@ -227,7 +222,7 @@ export default function HeroSection({
         }}
       >
         {/* Dark tint for text contrast */}
-        <div className="absolute inset-0 bg-black/30" />
+        
 
         {/* Loading bar along bottom edge */}
         {!allLoaded && (
@@ -242,15 +237,6 @@ export default function HeroSection({
           </div>
         )}
 
-        {/* Golden rule */}
-        <div
-          ref={lineRef}
-          className="absolute top-[60%] inset-x-0 h-px bg-[#C9A84C]/60"
-          style={{
-            transform: 'scaleX(0)',
-            transformOrigin: isFa ? 'right' : 'left',
-          }}
-        />
 
         {/* Hero text */}
         <div

@@ -38,7 +38,7 @@ export default async function FaqPage({
         <FaqAccordion />
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }

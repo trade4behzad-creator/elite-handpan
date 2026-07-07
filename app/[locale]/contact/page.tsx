@@ -38,7 +38,7 @@ export default async function ContactPage({
         <ContactForm />
       </main>
 
-      <Footer />
+      <Footer locale={locale} />
     </>
   )
 }
