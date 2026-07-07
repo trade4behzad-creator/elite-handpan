@@ -67,6 +67,7 @@ export default function HeroSection({
   const targetFrameRef = useRef(0)
   const currentFrameRef = useRef(0)
   const rafRef = useRef<number | null>(null)
+  const sectionMetrics = useRef({ top: 0, height: 0 })
 
   const drawFrame = useCallback((index: number) => {
   const canvas = canvasRef.current
@@ -100,9 +101,16 @@ export default function HeroSection({
     }
     rafRef.current = requestAnimationFrame(tick)
 
+    const updateMetrics = () => {
+      sectionMetrics.current = {
+        top: section.offsetTop,
+        height: section.offsetHeight,
+      }
+    }
+    updateMetrics()
     const handleScroll = () => {
-      const sectionTop = section.offsetTop
-      const sectionHeight = section.offsetHeight
+      const sectionTop = sectionMetrics.current.top
+      const sectionHeight = sectionMetrics.current.height
       const vh = window.innerHeight
       const scrollY = window.scrollY
       const switchPoint = sectionTop + sectionHeight - vh
@@ -159,6 +167,16 @@ export default function HeroSection({
       setSize()
       const section = sectionRef.current
       if (!section) return
+      const handleResize = () => {
+        setSize()
+        const section = sectionRef.current
+        if (!section) return
+        sectionMetrics.current = { top: section.offsetTop, height: section.offsetHeight }  // ← این خط جدیده
+        const vh = window.innerHeight
+        const switchPoint = section.offsetTop + section.offsetHeight - vh
+        const p = Math.max(0, Math.min(1, (window.scrollY - section.offsetTop) / (switchPoint - section.offsetTop)))
+        drawFrame(Math.min(Math.floor(p * TOTAL_FRAMES), TOTAL_FRAMES - 1))
+      }
       const vh = window.innerHeight
       const switchPoint = section.offsetTop + section.offsetHeight - vh
       const p = Math.max(0, Math.min(1, (window.scrollY - section.offsetTop) / (switchPoint - section.offsetTop)))
