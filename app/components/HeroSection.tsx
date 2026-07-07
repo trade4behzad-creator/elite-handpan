@@ -4,7 +4,7 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import type { Dictionary } from '../i18n'
 
-const TOTAL_FRAMES = 571
+const TOTAL_FRAMES = 91
 const BATCH_SIZE = 20
 
 function drawCover(
