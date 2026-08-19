@@ -158,11 +158,22 @@ export default function HeroSection({
   // Preload frames + resize
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    const section = sectionRef.current
+    const overlay = overlayRef.current
+    if (!canvas || !section || !overlay) return
+
+    const lastSize = { width: window.innerWidth, height: window.innerHeight }
 
     const setSize = () => {
+      const vh = window.innerHeight
       canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      canvas.height = vh
+      // Lock the on-screen height to a fixed px value instead of CSS 100vh,
+      // which otherwise visually stretches/shrinks as the mobile browser's
+      // address bar shows and hides while scrolling.
+      canvas.style.height = `${vh}px`
+      overlay.style.height = `${vh}px`
+      section.style.height = `${vh * 4}px`
       // Dark fill prevents white flash before first frame
       const ctx = canvas.getContext('2d')
       if (ctx) {
@@ -173,9 +184,17 @@ export default function HeroSection({
     setSize()
 
     const handleResize = () => {
+      const widthChanged = Math.abs(window.innerWidth - lastSize.width) > 5
+      // Mobile browsers toggle their address bar while scrolling, which fires
+      // 'resize' with only a small height delta (~50–150px). Ignore that so
+      // the hero canvas doesn't keep resizing/flickering while the user scrolls.
+      const heightChangedSignificantly = Math.abs(window.innerHeight - lastSize.height) > 150
+      if (!widthChanged && !heightChangedSignificantly) return
+
+      lastSize.width = window.innerWidth
+      lastSize.height = window.innerHeight
+
       setSize()
-      const section = sectionRef.current
-      if (!section) return
       sectionMetrics.current = { top: section.offsetTop, height: section.offsetHeight }
       const vh = window.innerHeight
       const switchPoint = section.offsetTop + section.offsetHeight - vh
