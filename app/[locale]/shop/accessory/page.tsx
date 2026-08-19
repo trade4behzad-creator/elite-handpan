@@ -5,6 +5,7 @@ import { getDictionary, hasLocale } from '../../../i18n'
 import type { Dictionary } from '../../../i18n'
 import Navbar from '../../../components/Navbar'
 import Footer from '../../../components/Footer'
+import ShopFilters from '../../../components/ShopFilters'
 import { supabaseAdmin } from '../../../../lib/supabase-admin'
 
 type Accessory = {
@@ -17,6 +18,7 @@ type Accessory = {
   price_fa: number | null
   description_en: string | null
   in_stock: boolean
+  is_featured: boolean
   accessory_images: { url: string }[] | null
 }
 
@@ -35,17 +37,41 @@ function AccessoriesSkeleton() {
   )
 }
 
-async function AccessoryList({ locale, dict }: { locale: string; dict: Dictionary }) {
-  const { data: accessories } = await supabaseAdmin
+async function AccessoryList({
+  locale,
+  dict,
+  category,
+  featured,
+  sort,
+}: {
+  locale: string
+  dict: Dictionary
+  category?: string
+  featured?: string
+  sort?: string
+}) {
+  let query = supabaseAdmin
     .from('accessories')
-    .select('id, name_en, name_fa, slug, category, price, price_fa, description_en, in_stock, accessory_images(url)')
-    .order('created_at', { ascending: true })
+    .select('id, name_en, name_fa, slug, category, price, price_fa, description_en, in_stock, is_featured, accessory_images(url)')
+
+  if (category) query = query.eq('category', category)
+  if (featured === '1') query = query.eq('is_featured', true)
+
+  if (sort === 'price_asc') {
+    query = query.order('price', { ascending: true })
+  } else if (sort === 'price_desc') {
+    query = query.order('price', { ascending: false })
+  } else {
+    query = query.order('created_at', { ascending: true })
+  }
+
+  const { data: accessories } = await query
 
   if (!accessories || accessories.length === 0) {
     return (
       <div className="text-center py-24 text-gray-400">
-        <p className="text-lg mb-2">No accessories available yet</p>
-        <p className="text-sm">Check back soon</p>
+        <p className="text-lg mb-2">{locale === 'fa' ? 'موردی یافت نشد' : 'No accessories match these filters'}</p>
+        <p className="text-sm">{locale === 'fa' ? 'فیلترها را تغییر دهید' : 'Try adjusting your filters'}</p>
       </div>
     )
   }
@@ -59,8 +85,16 @@ async function AccessoryList({ locale, dict }: { locale: string; dict: Dictionar
           <Link
             key={item.id}
             href={`/${locale}/shop/accessory/${item.slug}`}
-            className="group block bg-white border border-gray-200 hover:border-[#3F3E7A]/60 transition-all duration-300 rounded-[4px] overflow-hidden p-6"
+            className="group relative block bg-white border border-gray-200 hover:border-[#3F3E7A]/60 transition-all duration-300 rounded-[4px] overflow-hidden p-6"
           >
+            {item.is_featured && (
+              <span
+                className="absolute top-3 z-10 text-[10px] tracking-[0.15em] uppercase px-3 py-1 rounded-full text-white"
+                style={{ background: '#3F3E7A', insetInlineStart: '12px' }}
+              >
+                {locale === 'fa' ? 'پیشنهاد ویژه' : 'Featured'}
+              </span>
+            )}
             <div className="aspect-square bg-[#f5f5f5] flex items-center justify-center rounded-sm overflow-hidden mb-5 p-4">
               {img ? (
                 <img src={img} alt={name} className="w-full h-full object-contain mix-blend-multiply" />
@@ -83,14 +117,11 @@ async function AccessoryList({ locale, dict }: { locale: string; dict: Dictionar
             >
               {item.category ?? 'Accessory'}
             </p>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <span className="text-[#3F3E7A] text-sm font-medium">
                 {locale === 'fa' && item.price_fa
                   ? `${Number(item.price_fa).toLocaleString('en-US')} تومان`
                   : `$${Number(item.price).toLocaleString()}`}
-              </span>
-              <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#3F3E7A] transition-colors uppercase border border-gray-200 group-hover:border-[#3F3E7A]/60 px-3 py-1.5 rounded-[2px]">
-                {dict.products.cta}
               </span>
             </div>
           </Link>
@@ -102,12 +133,33 @@ async function AccessoryList({ locale, dict }: { locale: string; dict: Dictionar
 
 export default async function ShopAccessoryPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{ category?: string; featured?: string; sort?: string }>
 }) {
   const { locale } = await params
   if (!hasLocale(locale)) notFound()
   const dict = await getDictionary(locale as 'en' | 'fa')
+  const { category, featured, sort } = await searchParams
+
+  const { data: allAccessories } = await supabaseAdmin.from('accessories').select('category')
+  const categories = Array.from(
+    new Set((allAccessories ?? []).map((a) => a.category).filter((c): c is string => Boolean(c)))
+  ).sort()
+
+  const filterLabels = {
+    scaleLabel: locale === 'fa' ? 'دسته‌بندی' : 'Category',
+    notesLabel: '',
+    featuredLabel: locale === 'fa' ? 'پیشنهاد ویژه' : 'Featured',
+    sortLabel: locale === 'fa' ? 'مرتب‌سازی' : 'Sort',
+    allOption: locale === 'fa' ? 'همه' : 'All',
+    sortPriceAsc: locale === 'fa' ? 'قیمت: کم به زیاد' : 'Price: Low to High',
+    sortPriceDesc: locale === 'fa' ? 'قیمت: زیاد به کم' : 'Price: High to Low',
+    clearLabel: locale === 'fa' ? 'پاک کردن فیلترها' : 'Clear filters',
+    filtersTitle: locale === 'fa' ? 'فیلتر و مرتب‌سازی' : 'Filter & Sort',
+    sortRecommendedOption: locale === 'fa' ? 'پیشنهادی' : 'Recommended',
+  }
 
   return (
     <>
@@ -129,9 +181,18 @@ export default async function ShopAccessoryPage({
             </h1>
             <div className="mt-6 h-px w-16 bg-[#3F3E7A] opacity-60" />
           </div>
-          <Suspense fallback={<AccessoriesSkeleton />}>
-            <AccessoryList locale={locale} dict={dict} />
-          </Suspense>
+          <div className="flex flex-col md:flex-row gap-10 items-start">
+            <div className="w-full md:w-64 flex-shrink-0">
+              <Suspense fallback={null}>
+                <ShopFilters scales={[]} noteCounts={[]} categories={categories} labels={filterLabels} />
+              </Suspense>
+            </div>
+            <div className="flex-1 min-w-0">
+              <Suspense fallback={<AccessoriesSkeleton />}>
+                <AccessoryList locale={locale} dict={dict} category={category} featured={featured} sort={sort} />
+              </Suspense>
+            </div>
+          </div>
         </div>
       </main>
       <Footer locale={locale} />

@@ -2,8 +2,9 @@ import { notFound } from 'next/navigation'
 import { getDictionary, hasLocale } from '../../i18n'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import { supabaseAdmin } from '../../../lib/supabase-admin'
 
-const content = {
+const fallbackContent = {
   en: {
     eyebrow: 'OUR STORY',
     heading: 'About Elite',
@@ -16,12 +17,6 @@ const content = {
   },
 }
 
-const stats = [
-  { value: '2023', label: { en: 'Founded', fa: 'سال تأسیس' } },
-  { value: '3+',   label: { en: 'Countries', fa: 'کشور' } },
-  { value: '100+', label: { en: 'Instruments Made', fa: 'ساز ساخته شده' } },
-]
-
 export default async function AboutPage({
   params,
 }: {
@@ -33,8 +28,22 @@ export default async function AboutPage({
 
   const dict = await getDictionary(locale as 'en' | 'fa')
   const lang = locale as 'en' | 'fa'
-  const c = content[lang]
   const isRtl = locale === 'fa'
+
+  const { data: settings } = await supabaseAdmin
+    .from('site_settings')
+    .select('about_heading_en, about_heading_fa, about_body_en, about_body_fa, about_hero_image_url, about_team_image_url')
+    .eq('id', 1)
+    .maybeSingle()
+
+  const c = {
+    eyebrow: fallbackContent[lang].eyebrow,
+    heading: (lang === 'fa' ? settings?.about_heading_fa : settings?.about_heading_en) || fallbackContent[lang].heading,
+    body: (lang === 'fa' ? settings?.about_body_fa : settings?.about_body_en) || fallbackContent[lang].body,
+  }
+
+  const heroImage = settings?.about_hero_image_url || '/images/about-page/hero.jpg'
+  const teamImage = settings?.about_team_image_url || '/images/about-page/team.jpg'
 
   return (
     <>
@@ -43,7 +52,7 @@ export default async function AboutPage({
       {/* 1. Hero */}
       <div className="relative w-full" style={{ height: '60vh' }}>
         <img
-          src="/images/about-page/hero.jpg"
+          src={heroImage}
           alt="Elite Handpan workshop"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -81,7 +90,7 @@ export default async function AboutPage({
           {/* Part B — Team image */}
           <div className="mt-16">
             <img
-              src="/images/about-page/team.jpg"
+              src={teamImage}
               alt="Elite Handpan team"
               className="w-full rounded-sm object-cover"
               style={{ maxHeight: '600px' }}
@@ -90,27 +99,7 @@ export default async function AboutPage({
         </div>
       </section>
 
-      {/* 3. Stats row */}
-      <section className="bg-gray-50 py-16 px-8">
-        <div className="max-w-4xl mx-auto grid grid-cols-3 gap-8 text-center">
-          {stats.map((stat) => (
-            <div key={stat.value}>
-              <p
-                className="text-4xl md:text-5xl font-light mb-2"
-                style={{ color: '#3F3E7A', fontFamily: 'var(--font-cormorant)' }}
-              >
-                {stat.value}
-              </p>
-              <p
-                className="text-sm text-gray-500 tracking-wide"
-                style={{ fontFamily: 'var(--font-inter)' }}
-              >
-                {stat.label[lang]}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* 3. Stats row removed per request */}
 
       <Footer locale={locale} />
     </>

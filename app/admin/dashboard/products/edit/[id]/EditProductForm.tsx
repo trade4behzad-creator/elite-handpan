@@ -34,6 +34,7 @@ async function uploadImage(file: File, slug: string): Promise<string> {
   return publicUrl
 }
 const MAX_FILE_MB = 2
+const MAX_IMAGES = 20
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -71,10 +72,13 @@ export type Product = {
   notes: number
   price: number
   price_fa: number | null
+  price_installment: number | null
+  price_installment_fa: number | null
   description_en: string | null
   description_fa: string | null
   note_arrangement: string | null
   in_stock: boolean
+  is_featured: boolean
 }
 
 export default function EditProductForm({
@@ -93,9 +97,10 @@ export default function EditProductForm({
   const [uploading, setUploading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [inStock, setInStock] = useState(product.in_stock)
+  const [isFeatured, setIsFeatured] = useState(product.is_featured)
   const [isPending, startTransition] = useTransition()
 
-  const remainingSlots = Math.max(0, 3 - existingImages.length)
+  const remainingSlots = Math.max(0, MAX_IMAGES - existingImages.length)
   const isSubmitting = uploading || isPending
 
   async function refetchImages() {
@@ -197,6 +202,7 @@ export default function EditProductForm({
       <form ref={formRef} onSubmit={handleSubmit}>
         <input type="hidden" name="id" value={product.id} />
         <input type="hidden" name="in_stock" value={String(inStock)} />
+        <input type="hidden" name="is_featured" value={String(isFeatured)} />
 
         <div
           style={{
@@ -249,6 +255,12 @@ export default function EditProductForm({
               <label style={labelStyle}>قیمت (تومان)</label>
               <input name="price_fa" type="number" min={0} defaultValue={product.price_fa ?? ''} style={{ ...inputStyle, direction: 'ltr' }} />
             </div>
+          </div>
+
+          {/* Installment price */}
+          <div style={fieldStyle}>
+            <label style={labelStyle}>قیمت قسطی (تومان)</label>
+            <input name="price_installment_fa" type="number" min={0} defaultValue={product.price_installment_fa ?? ''} style={{ ...inputStyle, direction: 'ltr' }} />
           </div>
 
           {/* Descriptions */}
@@ -304,6 +316,44 @@ export default function EditProductForm({
             </button>
             <span style={{ color: inStock ? '#4ade80' : '#f87171', fontSize: '13px' }}>
               {inStock ? 'موجود' : 'ناموجود'}
+            </span>
+          </div>
+
+          {/* Featured toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={labelStyle}>پیشنهاد ویژه (نمایش در صفحه شاپ)</span>
+            <button
+              type="button"
+              onClick={() => setIsFeatured((v) => !v)}
+              aria-label="تغییر وضعیت پیشنهاد ویژه"
+              style={{
+                position: 'relative',
+                width: '52px',
+                height: '28px',
+                borderRadius: '14px',
+                background: isFeatured ? GOLD : '#2a2a2a',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  right: isFeatured ? '4px' : '24px',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  transition: 'right 0.2s',
+                  display: 'block',
+                }}
+              />
+            </button>
+            <span style={{ color: isFeatured ? '#8f8dd6' : '#666', fontSize: '13px' }}>
+              {isFeatured ? '★ ویژه' : '☆ عادی'}
             </span>
           </div>
 
@@ -392,7 +442,7 @@ export default function EditProductForm({
               </div>
             ) : (
               <p style={{ color: '#444', fontSize: '13px', margin: 0 }}>
-                حداکثر ۳ تصویر — برای افزودن، ابتدا یکی را حذف کنید
+                حداکثر {MAX_IMAGES} تصویر — برای افزودن، ابتدا یکی را حذف کنید
               </p>
             )}
           </div>

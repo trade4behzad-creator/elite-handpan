@@ -24,18 +24,18 @@ export default async function ContactPage({
             className="text-[#3F3E7A] text-xs tracking-[0.4em] uppercase mb-4"
             style={{ fontFamily: 'var(--font-inter)' }}
           >
-            Get in Touch
+            {dict.contact.heading}
           </p>
           <h1
             className="text-5xl md:text-6xl font-light text-[#111111]"
             style={{ fontFamily: 'var(--font-cormorant)' }}
           >
-            Contact Us
+            {dict.nav.contact}
           </h1>
           <div className="mt-6 h-px w-16 bg-[#3F3E7A] opacity-60" />
         </div>
 
-        <ContactForm />
+        <ContactForm locale={locale} />
       </main>
 
       <Footer locale={locale} />

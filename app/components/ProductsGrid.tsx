@@ -74,12 +74,9 @@ export default function ProductsGrid({
               >
                 {product.scale} · {product.notes} {dict.products.notes}
               </p>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center">
                 <span className="text-[#3F3E7A] text-sm font-medium">
                   ${Number(product.price).toLocaleString()}
-                </span>
-                <span className="text-xs tracking-[0.2em] text-gray-400 group-hover:text-[#3F3E7A] transition-colors uppercase border border-gray-200 group-hover:border-[#3F3E7A]/60 px-3 py-1.5 rounded-[2px]">
-                  {dict.products.cta}
                 </span>
               </div>
             </Link>

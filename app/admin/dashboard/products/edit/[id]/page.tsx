@@ -25,7 +25,7 @@ export default function EditProductPage() {
 
       const { data: p, error: pErr } = await supabase
         .from('products')
-        .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, description_en, description_fa, note_arrangement, in_stock')
+        .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, price_installment, price_installment_fa, description_en, description_fa, note_arrangement, in_stock, is_featured')
         .eq('id', id)
         .single()
 

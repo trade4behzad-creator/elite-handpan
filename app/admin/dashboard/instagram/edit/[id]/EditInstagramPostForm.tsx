@@ -102,7 +102,7 @@ export default function EditInstagramPostForm({
           </div>
 
           <div style={fieldStyle}>
-            <label style={labelStyle}>ترتیب نمایش (عدد کوچیک‌تر = اول)</label>
+            <label style={labelStyle}>ترتیب نمایش (عدد کوچک‌تر = اول)</label>
             <input
               name="order"
               type="number"

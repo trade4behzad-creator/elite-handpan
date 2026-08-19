@@ -1,8 +1,10 @@
 {
   "nav": {
     "products": "سازها",
-    "contact": "تماس",
-    "shop": "فروشگاه"
+    "shop": "فروشگاه",
+    "about": "درباره ما",
+    "contact": "تماس با ما",
+    "faq": "سوالات متداول"
   },
   "hero": {
     "eyebrow": "از نور آمده",
@@ -12,7 +14,12 @@
   "products": {
     "heading": "سازها",
     "notes": "نت",
-    "cta": "استعلام"
+    "cta": "مشاهده ساز",
+    "addToCart": "افزودن به سبد"
+  },
+  "specialOffer": {
+    "eyebrow": "پیشنهاد ویژه",
+    "cta": "مشاهده ساز"
   },
   "contact": {
     "heading": "تماس با ما",

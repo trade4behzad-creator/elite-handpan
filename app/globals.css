@@ -32,3 +32,9 @@ body {
 [dir="rtl"] body {
   font-family: var(--font-vazirmatn), Arial, sans-serif;
 }
+
+/* Force every element on the Persian site to use Vazirmatn, even where a
+   component hardcodes an inline Latin font-family (Cormorant/Inter). */
+[dir="rtl"] * {
+  font-family: var(--font-vazirmatn), Arial, sans-serif !important;
+}

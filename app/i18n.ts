@@ -1,8 +1,9 @@
 export type Dictionary = {
-  nav: { products: string; contact: string; shop: string }
+  nav: { products: string; shop: string; about: string; contact: string; faq: string }
   hero: { eyebrow: string; title: string; subtitle: string }
-  products: { heading: string; notes: string; cta: string }
+  products: { heading: string; notes: string; cta: string; addToCart: string }
   contact: { heading: string; tagline: string }
+  specialOffer: { eyebrow: string; cta: string }
 }
 
 const dictionaries: Record<string, () => Promise<Dictionary>> = {

@@ -4,6 +4,7 @@ import Navbar from '../../../../components/Navbar'
 import Footer from '../../../../components/Footer'
 import ProductDetail from './ProductDetail'
 import { supabaseAdmin } from '../../../../../lib/supabase-admin'
+import { getProductFeatures } from '../../../../../lib/getProductFeatures'
 
 export default async function ProductPage({
   params,
@@ -15,7 +16,7 @@ export default async function ProductPage({
 
   const { data: product } = await supabaseAdmin
     .from('products')
-    .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, description_en, description_fa, note_arrangement, in_stock')
+    .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, price_installment, price_installment_fa, description_en, description_fa, note_arrangement, in_stock')
     .eq('slug', slug)
     .single()
 
@@ -29,11 +30,12 @@ export default async function ProductPage({
 
   const images = imageRows?.map((r) => r.url) ?? []
   const dict = await getDictionary(locale as 'en' | 'fa')
+  const features = await getProductFeatures(locale)
 
   return (
     <>
       <Navbar dict={dict} locale={locale} />
-      <ProductDetail product={product} images={images} locale={locale} dict={dict} />
+      <ProductDetail product={product} images={images} locale={locale} dict={dict} features={features} />
       <Footer locale={locale} />
     </>
   )

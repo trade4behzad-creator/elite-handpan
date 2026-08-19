@@ -1,8 +1,10 @@
 {
   "nav": {
     "products": "Products",
-    "contact": "Contact",
-    "shop": "Shop"
+    "shop": "Shop",
+    "about": "About Us",
+    "contact": "Contact Us",
+    "faq": "FAQ"
   },
   "hero": {
     "eyebrow": "Forged From Light",
@@ -12,7 +14,12 @@
   "products": {
     "heading": "Instruments",
     "notes": "Notes",
-    "cta": "Inquire"
+    "cta": "View Instrument",
+    "addToCart": "Add to Basket"
+  },
+  "specialOffer": {
+    "eyebrow": "Special Offer",
+    "cta": "View Instrument"
   },
   "contact": {
     "heading": "Get in Touch",

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { hasLocale } from '../i18n'
 import '../globals.css'
 import ReCaptchaProvider from './ReCaptchaProvider'
+import { CartProvider } from '../context/CartContext'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -49,7 +50,9 @@ export default async function LocaleLayout({
       className={`${cormorant.variable} ${inter.variable} ${vazirmatn.variable}`}
     >
       <body className="bg-white text-[#111111] antialiased overflow-x-hidden">
-        <ReCaptchaProvider>{children}</ReCaptchaProvider>
+        <ReCaptchaProvider>
+          <CartProvider>{children}</CartProvider>
+        </ReCaptchaProvider>
       </body>
     </html>
   )

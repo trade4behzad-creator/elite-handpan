@@ -49,17 +49,25 @@ function formatDate(iso: string) {
 export default async function OrdersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; phone?: string; sort?: string }>
 }) {
-  const { status: filterStatus } = await searchParams
+  const { status: filterStatus, phone: filterPhone, sort } = await searchParams
 
   let query = supabaseAdmin
     .from('orders')
     .select('id, created_at, status, total_usd, total_fa, customer_name, customer_email, customer_phone')
-    .order('created_at', { ascending: false })
+
+  if (sort === 'phone') {
+    query = query.order('customer_phone', { ascending: true }).order('created_at', { ascending: false })
+  } else {
+    query = query.order('created_at', { ascending: false })
+  }
 
   if (filterStatus) {
     query = query.eq('status', filterStatus)
+  }
+  if (filterPhone) {
+    query = query.ilike('customer_phone', `%${filterPhone.trim()}%`)
   }
 
   const { data: orders, error } = await query
@@ -116,6 +124,65 @@ export default async function OrdersPage({
         })}
       </div>
 
+      {/* Phone search — see all orders placed with a given phone number */}
+      {filterPhone && orders && (
+        <div style={{ background: 'rgba(63,62,122,0.08)', border: '1px solid rgba(63,62,122,0.3)', borderRadius: '6px', padding: '12px 18px', marginBottom: '16px', color: '#8f8dd6', fontSize: '13px' }}>
+          سابقه خرید شماره <span style={{ direction: 'ltr', display: 'inline-block' }}>{filterPhone}</span>: {orders.length} سفارش
+        </div>
+      )}
+      <form method="GET" style={{ display: 'flex', gap: '8px', marginBottom: '24px', maxWidth: '360px' }}>
+        {filterStatus && <input type="hidden" name="status" value={filterStatus} />}
+        <input
+          type="text"
+          name="phone"
+          defaultValue={filterPhone ?? ''}
+          placeholder="جستجو بر اساس شماره تلفن مشتری..."
+          style={{
+            flex: 1,
+            padding: '9px 14px',
+            background: '#0a0a0a',
+            border: '1px solid #2a2a2a',
+            borderRadius: '4px',
+            color: '#f5f5f5',
+            fontSize: '13px',
+            direction: 'ltr',
+            outline: 'none',
+            fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+          }}
+        />
+        <button
+          type="submit"
+          style={{
+            padding: '9px 18px',
+            background: GOLD,
+            border: 'none',
+            borderRadius: '4px',
+            color: '#0a0a0a',
+            fontSize: '13px',
+            fontWeight: 600,
+            cursor: 'pointer',
+          }}
+        >
+          جستجو
+        </button>
+        {filterPhone && (
+          <Link
+            href={filterStatus ? `/admin/dashboard/orders?status=${filterStatus}` : '/admin/dashboard/orders'}
+            style={{
+              padding: '9px 14px',
+              border: '1px solid #2a2a2a',
+              borderRadius: '4px',
+              color: '#888',
+              fontSize: '13px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            پاک کردن
+          </Link>
+        )}
+      </form>
+
       {/* Error */}
       {error && (
         <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '6px', padding: '14px 20px', marginBottom: '24px', color: '#f87171', fontSize: '14px' }}>
@@ -137,7 +204,24 @@ export default async function OrdersPage({
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #1e1e1e' }}>
-                {['شناسه', 'مشتری', 'تاریخ', 'مبلغ', 'وضعیت', 'عملیات'].map((h) => (
+                {['شناسه', 'مشتری'].map((h) => (
+                  <th key={h} style={{ padding: '14px 20px', fontSize: '12px', color: '#555', fontWeight: '400', textAlign: 'right', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                    {h}
+                  </th>
+                ))}
+                <th style={{ padding: '14px 20px', fontSize: '12px', fontWeight: '400', textAlign: 'right', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+                  <Link
+                    href={`/admin/dashboard/orders?${new URLSearchParams({
+                      ...(filterStatus ? { status: filterStatus } : {}),
+                      ...(filterPhone ? { phone: filterPhone } : {}),
+                      sort: sort === 'phone' ? '' : 'phone',
+                    }).toString()}`}
+                    style={{ color: sort === 'phone' ? GOLD : '#555', textDecoration: 'none' }}
+                  >
+                    شماره تلفن {sort === 'phone' ? '↑' : ''}
+                  </Link>
+                </th>
+                {['تاریخ', 'مبلغ', 'وضعیت', 'عملیات'].map((h) => (
                   <th
                     key={h}
                     style={{ padding: '14px 20px', fontSize: '12px', color: '#555', fontWeight: '400', textAlign: 'right', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}
@@ -174,6 +258,21 @@ export default async function OrdersPage({
                       )}
                     </td>
 
+                    {/* Phone — click to see this customer's full order history */}
+                    <td style={{ padding: '14px 20px' }}>
+                      {order.customer_phone ? (
+                        <Link
+                          href={`/admin/dashboard/orders?phone=${encodeURIComponent(order.customer_phone)}`}
+                          style={{ color: GOLD, fontSize: '13px', direction: 'ltr', display: 'block', textDecoration: 'none' }}
+                          title="مشاهده سابقه خرید این شماره"
+                        >
+                          {order.customer_phone}
+                        </Link>
+                      ) : (
+                        <span style={{ color: '#555', fontSize: '13px' }}>—</span>
+                      )}
+                    </td>
+
                     {/* Date */}
                     <td style={{ padding: '14px 20px', color: '#888', fontSize: '12px', whiteSpace: 'nowrap' }}>
                       {formatDate(order.created_at)}
@@ -181,7 +280,11 @@ export default async function OrdersPage({
 
                     {/* Amount */}
                     <td style={{ padding: '14px 20px', color: GOLD, fontSize: '14px', direction: 'ltr', whiteSpace: 'nowrap' }}>
-                      {order.total_usd ? `$${Number(order.total_usd).toLocaleString()}` : '—'}
+                      {order.total_fa
+                        ? `${Number(order.total_fa).toLocaleString('en-US')} تومان`
+                        : order.total_usd
+                          ? `$${Number(order.total_usd).toLocaleString()}`
+                          : '—'}
                     </td>
 
                     {/* Status */}

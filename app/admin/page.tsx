@@ -1,10 +1,32 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { supabaseAdmin } from '../../lib/supabase-admin'
+import { verifyAdminPassword } from '../../lib/adminAuth'
+import { checkRateLimit } from '../../lib/rateLimit'
 
 async function loginAction(formData: FormData) {
   'use server'
   const password = formData.get('password') as string
-  if (password === process.env.ADMIN_PASSWORD) {
+
+  const headerList = await headers()
+  const ip = headerList.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
+
+  // Max 5 attempts per 15 minutes per IP
+  if (!checkRateLimit(`admin-login:${ip}`, 5, 15 * 60 * 1000)) {
+    redirect('/admin?error=rate_limit')
+  }
+
+  const { data: settings } = await supabaseAdmin
+    .from('site_settings')
+    .select('admin_password_hash')
+    .eq('id', 1)
+    .maybeSingle()
+
+  const isValid = settings?.admin_password_hash
+    ? verifyAdminPassword(password, settings.admin_password_hash)
+    : password === process.env.ADMIN_PASSWORD
+
+  if (isValid) {
     const cookieStore = await cookies()
     cookieStore.set('admin_auth', 'true', {
       httpOnly: true,
@@ -25,6 +47,7 @@ export default async function AdminLoginPage({
 }) {
   const params = await searchParams
   const hasError = params.error === '1'
+  const isRateLimited = params.error === 'rate_limit'
 
   return (
     <main
@@ -95,6 +118,23 @@ export default async function AdminLoginPage({
             }}
           >
             رمز عبور اشتباه است
+          </div>
+        )}
+
+        {isRateLimited && (
+          <div
+            style={{
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.3)',
+              borderRadius: '4px',
+              padding: '12px 16px',
+              marginBottom: '24px',
+              color: '#f87171',
+              fontSize: '14px',
+              textAlign: 'center',
+            }}
+          >
+            تعداد تلاش‌ها بیش از حد مجاز است. لطفاً چند دقیقه دیگر دوباره تلاش کنید.
           </div>
         )}
 

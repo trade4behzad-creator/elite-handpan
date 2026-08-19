@@ -9,8 +9,12 @@ async function getStats() {
     .from('messages')
     .select('*', { count: 'exact', head: true })
     .eq('read', false)
+  const { count: pendingOrders } = await supabaseAdmin
+    .from('orders')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'pending')
 
-  return { products: products ?? 0, messages: messages ?? 0, unread: unread ?? 0 }
+  return { products: products ?? 0, messages: messages ?? 0, unread: unread ?? 0, pendingOrders: pendingOrders ?? 0 }
 }
 
 const GOLD = '#3F3E7A'
@@ -19,9 +23,10 @@ export default async function DashboardPage() {
   const stats = await getStats()
 
   const cards = [
-    { label: 'محصولات هندپن', value: stats.products, sub: 'در پایگاه داده', color: GOLD },
-    { label: 'پیام‌ها', value: stats.messages, sub: 'مجموع دریافتی', color: '#60a5fa' },
-    { label: 'پیام‌های خوانده‌نشده', value: stats.unread, sub: 'نیاز به پاسخ', color: '#f87171' },
+    { label: 'سفارش‌های جدید', value: stats.pendingOrders, sub: 'در انتظار بررسی', color: '#4ade80', href: '/admin/dashboard/orders' },
+    { label: 'محصولات هندپن', value: stats.products, sub: 'در پایگاه داده', color: GOLD, href: '/admin/dashboard/products' },
+    { label: 'پیام‌ها', value: stats.messages, sub: 'مجموع دریافتی', color: '#60a5fa', href: '/admin/dashboard/messages' },
+    { label: 'پیام‌های خوانده‌نشده', value: stats.unread, sub: 'نیاز به پاسخ', color: '#f87171', href: '/admin/dashboard/messages' },
   ]
 
   return (
@@ -37,13 +42,17 @@ export default async function DashboardPage() {
       {/* Stat cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px', marginBottom: '48px' }}>
         {cards.map((card) => (
-          <div
+          <a
             key={card.label}
+            href={card.href}
             style={{
+              display: 'block',
               background: '#111',
               border: '1px solid #1e1e1e',
               borderRadius: '8px',
               padding: '28px 24px',
+              textDecoration: 'none',
+              transition: 'border-color 0.15s',
             }}
           >
             <p style={{ color: '#666', fontSize: '13px', margin: '0 0 12px' }}>{card.label}</p>
@@ -51,7 +60,7 @@ export default async function DashboardPage() {
               {card.value}
             </p>
             <p style={{ color: '#444', fontSize: '12px', margin: 0 }}>{card.sub}</p>
-          </div>
+          </a>
         ))}
       </div>
 
@@ -60,7 +69,8 @@ export default async function DashboardPage() {
         <h2 style={{ fontSize: '16px', fontWeight: '400', color: '#f5f5f5', margin: '0 0 20px' }}>دسترسی سریع</h2>
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
           {[
-            { href: '/admin/dashboard/products/new', label: '+ افزودن محصول جدید' },
+            { href: '/admin/dashboard/products/new', label: '+ افزودن هندپن جدید' },
+            { href: '/admin/dashboard/accessories/new', label: '+ افزودن اکسسوری جدید' },
             { href: '/admin/dashboard/messages', label: 'مشاهده پیام‌ها' },
             { href: '/admin/dashboard/products', label: 'لیست محصولات' },
           ].map((link) => (

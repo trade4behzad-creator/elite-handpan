@@ -10,14 +10,24 @@ export default async function ProductsSection({
   dict: Dictionary
   locale: string
 }) {
+  // How many handpans exist in total decides whether we show 3 or 6 on the homepage:
+  // fewer than 6 in the shop → show 3; 6 or more → show 6.
+  const { count: totalHandpans } = await supabaseAdmin
+    .from('products')
+    .select('id', { count: 'exact', head: true })
+    .eq('category', 'handpan')
+
+  const displayLimit = (totalHandpans ?? 0) >= 6 ? 6 : 3
+
   const { data: products, error } = await supabaseAdmin
     .from('products')
     .select('id, name_en, name_fa, slug, scale, notes, price, price_fa, in_stock, product_images(id, url, sort_order)')
     .eq('category', 'handpan')
-    .order('created_at')
-    .limit(6)
+    .order('display_order', { ascending: true })
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true })
+    .limit(displayLimit)
 
-  console.log('ProductsSection products:', JSON.stringify(products, null, 2))
   if (error) console.error('ProductsSection error:', error)
 
   const gridProducts: GridProduct[] = (products ?? []).map((p: any) => {
@@ -45,12 +55,6 @@ export default async function ProductsSection({
       <div className="max-w-6xl mx-auto">
         {/* Section heading — keep the motion animation here as a client island */}
         <div className="mb-16">
-          <p
-            className="text-[#3F3E7A] text-xs tracking-[0.4em] uppercase mb-4"
-            style={{ fontFamily: 'var(--font-inter)' }}
-          >
-            {locale === 'fa' ? 'کلکسیون' : 'Collection'}
-          </p>
           <h2
             className="text-5xl md:text-6xl font-light text-[#111111]"
             style={{ fontFamily: 'var(--font-cormorant)' }}

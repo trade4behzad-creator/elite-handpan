@@ -2,10 +2,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { supabaseAdmin } from '../../lib/supabase-admin'
 
-function TwitterIcon() {
+function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.226 1.36.194 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+      <path d="M12.004 2.003c-5.514 0-9.997 4.483-9.997 9.997 0 1.762.462 3.485 1.34 5.003l-1.42 5.19 5.313-1.394a9.96 9.96 0 0 0 4.764 1.213h.004c5.514 0 9.997-4.483 9.997-9.997 0-2.671-1.04-5.182-2.929-7.071a9.937 9.937 0 0 0-7.072-2.941zm0 18.174h-.003a8.16 8.16 0 0 1-4.158-1.14l-.298-.177-3.153.827.842-3.075-.194-.315a8.15 8.15 0 0 1-1.253-4.34c0-4.508 3.669-8.176 8.18-8.176a8.13 8.13 0 0 1 5.784 2.398 8.12 8.12 0 0 1 2.395 5.782c0 4.508-3.669 8.216-8.14 8.216z" />
     </svg>
   )
 }
@@ -18,32 +19,40 @@ function InstagramIcon() {
   )
 }
 
-function YouTubeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-    </svg>
-  )
-}
-
 function GoldDivider() {
   return <div className="w-10 h-[2px] bg-[#3F3E7A] mt-1 mb-4" />
 }
 
 export default async function Footer({ locale }: { locale: string }) {
+  const isFa = locale === 'fa'
   const { data: instagramPosts } = await supabaseAdmin
     .from('instagram_posts')
     .select('*')
     .order('order', { ascending: true })
     .limit(6)
 
+  const { data: settings } = await supabaseAdmin
+    .from('site_settings')
+    .select('contact_email, contact_phone, contact_address, whatsapp_number, instagram_url')
+    .eq('id', 1)
+    .maybeSingle()
+
+  const contactEmail = settings?.contact_email || 'info@elitehandpan.com'
+  const contactPhone = settings?.contact_phone || '+989000000000'
+  const contactAddress = settings?.contact_address || 'Tehran, Iran'
+  const whatsappNumber = settings?.whatsapp_number || contactPhone
+  const instagramUrl = settings?.instagram_url || 'https://www.instagram.com/elite_handpan/'
+
   const posts = instagramPosts ?? []
   const emptySlots = Math.max(0, 6 - posts.length)
 
   const socialLinks = [
-    { icon: <TwitterIcon />, label: 'Twitter', href: '#' },
-    { icon: <InstagramIcon />, label: 'Instagram', href: '#' },
-    { icon: <YouTubeIcon />, label: 'YouTube', href: '#' },
+    { icon: <InstagramIcon />, label: 'Instagram', href: instagramUrl },
+    {
+      icon: <WhatsAppIcon />,
+      label: 'WhatsApp',
+      href: `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`,
+    },
   ]
 
   return (
@@ -90,46 +99,41 @@ export default async function Footer({ locale }: { locale: string }) {
 
           {/* Col 2 — Contact us */}
           <div>
-            <h3 className="text-base font-semibold">Contact us</h3>
+            <h3 className="text-base font-semibold">{isFa ? 'تماس با ما' : 'Contact us'}</h3>
             <GoldDivider />
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
-                <a href="mailto:info@elitehandpan.com" className="hover:text-[#3F3E7A] transition-colors">
-                  info@elitehandpan.com
+                <a href={`mailto:${contactEmail}`} className="hover:text-[#3F3E7A] transition-colors">
+                  {contactEmail}
                 </a>
               </li>
               <li>
-                <a href="tel:+989000000000" className="hover:text-[#3F3E7A] transition-colors">
-                  +98 900 000 0000
+                <a href={`tel:${contactPhone}`} className="hover:text-[#3F3E7A] transition-colors">
+                  {contactPhone}
                 </a>
               </li>
-              <li className="text-gray-400">Tehran, Iran</li>
+              <li className="text-gray-400">{contactAddress}</li>
             </ul>
           </div>
 
           {/* Col 3 — Other Links */}
           <div>
-            <h3 className="text-base font-semibold">Other Links</h3>
+            <h3 className="text-base font-semibold">{isFa ? 'لینک‌های دیگر' : 'Other Links'}</h3>
             <GoldDivider />
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <Link href={`/${locale}/about`} className="hover:text-[#3F3E7A] transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="#instruments" className="hover:text-[#3F3E7A] transition-colors">
-                  Instruments
+                  {isFa ? 'درباره ما' : 'About Us'}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/contact`} className="hover:text-[#3F3E7A] transition-colors">
-                  Contact Us
+                  {isFa ? 'تماس با ما' : 'Contact Us'}
                 </Link>
               </li>
               <li>
                 <Link href={`/${locale}/faq`} className="hover:text-[#3F3E7A] transition-colors">
-                  FAQ
+                  {isFa ? 'سوالات متداول' : 'FAQ'}
                 </Link>
               </li>
             </ul>
@@ -137,7 +141,7 @@ export default async function Footer({ locale }: { locale: string }) {
 
           {/* Col 4 — Instagram */}
           <div>
-            <h3 className="text-base font-semibold">Instagram</h3>
+            <h3 className="text-base font-semibold">{isFa ? 'اینستاگرام' : 'Instagram'}</h3>
             <GoldDivider />
             <div className="grid grid-cols-3 gap-1.5">
               {posts.map((post) => (
@@ -173,7 +177,7 @@ export default async function Footer({ locale }: { locale: string }) {
       <div className="relative z-10">
         <div className="w-full h-px bg-[#3F3E7A]" />
         <p className="text-center text-sm text-gray-500 py-5">
-          Copyrights 2026 © Elite Handpan. All rights reserved.
+          {isFa ? 'کلیه حقوق محفوظ است © ۲۰۲۶ الیت هندپن.' : 'Copyrights 2026 © Elite Handpan. All rights reserved.'}
         </p>
       </div>
     </footer>

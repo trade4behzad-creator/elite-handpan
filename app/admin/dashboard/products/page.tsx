@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { supabaseAdmin } from '../../../../lib/supabase-admin'
 import { revalidatePath } from 'next/cache'
+import { toggleFeatured, setHomeFeatured, reorderProduct } from './actions'
 
 type Product = {
   id: string
@@ -10,6 +11,10 @@ type Product = {
   price: number
   in_stock: boolean
   slug: string
+  category: string
+  is_featured: boolean
+  is_home_featured: boolean
+  display_order: number
 }
 
 async function deleteProduct(formData: FormData) {
@@ -39,8 +44,32 @@ export default async function ProductsPage({
 
   const { data: products, error } = await supabaseAdmin
     .from('products')
-    .select('id, name_en, name_fa, scale, price, in_stock, slug')
+    .select('id, name_en, name_fa, scale, price, in_stock, slug, category, is_featured, is_home_featured, display_order')
+    .order('display_order', { ascending: true })
     .order('created_at', { ascending: false })
+    .order('id', { ascending: true })
+
+  async function handleToggleFeatured(formData: FormData) {
+    'use server'
+    const id = formData.get('id') as string
+    const current = formData.get('current') === 'true'
+    await toggleFeatured(id, current)
+  }
+
+  async function handleSetHomeFeatured(formData: FormData) {
+    'use server'
+    const id = formData.get('id') as string
+    const current = formData.get('current') === 'true'
+    await setHomeFeatured(id, !current)
+  }
+
+  async function handleReorder(formData: FormData) {
+    'use server'
+    const id = formData.get('id') as string
+    const category = formData.get('category') as string
+    const direction = formData.get('direction') as string
+    await reorderProduct(id, category, direction === 'up' ? -1 : 1)
+  }
 
   return (
     <div>
@@ -144,7 +173,7 @@ export default async function ProductsPage({
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #1e1e1e' }}>
-                {['نام انگلیسی', 'نام فارسی', 'گام', 'قیمت', 'موجودی', 'عملیات'].map((h) => (
+                {['ترتیب', 'نام انگلیسی', 'نام فارسی', 'گام', 'قیمت', 'موجودی', 'پیشنهاد ویژه', 'صفحه اول', 'عملیات'].map((h) => (
                   <th
                     key={h}
                     style={{
@@ -171,6 +200,49 @@ export default async function ProductsPage({
                     transition: 'background 0.1s',
                   }}
                 >
+                  {/* Reorder */}
+                  <td style={{ padding: '14px 20px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <form action={handleReorder}>
+                        <input type="hidden" name="id" value={product.id} />
+                        <input type="hidden" name="category" value={product.category ?? 'handpan'} />
+                        <input type="hidden" name="direction" value="up" />
+                        <button
+                          type="submit"
+                          disabled={i === 0}
+                          title="انتقال به بالا"
+                          style={{
+                            width: '26px', height: '22px', background: 'transparent',
+                            border: '1px solid #2a2a2a', borderRadius: '4px',
+                            color: i === 0 ? '#333' : '#888', cursor: i === 0 ? 'not-allowed' : 'pointer',
+                            fontSize: '12px', lineHeight: 1,
+                          }}
+                        >
+                          ▲
+                        </button>
+                      </form>
+                      <form action={handleReorder}>
+                        <input type="hidden" name="id" value={product.id} />
+                        <input type="hidden" name="category" value={product.category ?? 'handpan'} />
+                        <input type="hidden" name="direction" value="down" />
+                        <button
+                          type="submit"
+                          disabled={i === products.length - 1}
+                          title="انتقال به پایین"
+                          style={{
+                            width: '26px', height: '22px', background: 'transparent',
+                            border: '1px solid #2a2a2a', borderRadius: '4px',
+                            color: i === products.length - 1 ? '#333' : '#888',
+                            cursor: i === products.length - 1 ? 'not-allowed' : 'pointer',
+                            fontSize: '12px', lineHeight: 1,
+                          }}
+                        >
+                          ▼
+                        </button>
+                      </form>
+                    </div>
+                  </td>
+
                   {/* Name EN */}
                   <td style={{ padding: '14px 20px' }}>
                     <span style={{ color: '#aaa', fontSize: '14px', direction: 'ltr', display: 'block' }}>
@@ -217,6 +289,56 @@ export default async function ProductsPage({
                         }}
                       >
                         {product.in_stock ? 'موجود' : 'ناموجود'}
+                      </button>
+                    </form>
+                  </td>
+
+                  {/* Featured toggle */}
+                  <td style={{ padding: '14px 20px' }}>
+                    <form action={handleToggleFeatured}>
+                      <input type="hidden" name="id" value={product.id} />
+                      <input type="hidden" name="current" value={String(product.is_featured)} />
+                      <button
+                        type="submit"
+                        title="کلیک کنید برای تغییر"
+                        style={{
+                          padding: '4px 14px',
+                          background: product.is_featured ? 'rgba(63,62,122,0.12)' : 'transparent',
+                          border: `1px solid ${product.is_featured ? '#3F3E7A' : '#333'}`,
+                          borderRadius: '12px',
+                          color: product.is_featured ? '#8f8dd6' : '#555',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {product.is_featured ? '★ ویژه' : '☆ عادی'}
+                      </button>
+                    </form>
+                  </td>
+
+                  {/* Home featured (special offer) toggle — only one at a time */}
+                  <td style={{ padding: '14px 20px' }}>
+                    <form action={handleSetHomeFeatured}>
+                      <input type="hidden" name="id" value={product.id} />
+                      <input type="hidden" name="current" value={String(product.is_home_featured)} />
+                      <button
+                        type="submit"
+                        title={product.is_home_featured ? 'حذف از صفحه اول' : 'نمایش در صفحه اول به عنوان پیشنهاد ویژه'}
+                        style={{
+                          padding: '4px 14px',
+                          background: product.is_home_featured ? 'rgba(34,197,94,0.1)' : 'transparent',
+                          border: `1px solid ${product.is_home_featured ? 'rgba(34,197,94,0.4)' : '#333'}`,
+                          borderRadius: '12px',
+                          color: product.is_home_featured ? '#4ade80' : '#555',
+                          fontSize: '12px',
+                          cursor: 'pointer',
+                          fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {product.is_home_featured ? '✓ فعال' : 'انتخاب'}
                       </button>
                     </form>
                   </td>

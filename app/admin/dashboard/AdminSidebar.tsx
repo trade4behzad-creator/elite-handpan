@@ -8,6 +8,7 @@ const navItems = [
   { href: '/admin/dashboard/products', label: 'محصولات هندپن', icon: '◎' },
   { href: '/admin/dashboard/accessories', label: 'اکسسوری', icon: '◇' },
   { href: '/admin/dashboard/instagram', label: 'اینستاگرام', icon: '◐' },
+  { href: '/admin/dashboard/faq', label: 'سوالات متداول', icon: '❖' },
   { href: '/admin/dashboard/messages', label: 'پیام‌ها', icon: '◻' },
   { href: '/admin/dashboard/settings', label: 'تنظیمات', icon: '⊙' },
 ]

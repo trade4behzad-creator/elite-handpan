@@ -8,15 +8,8 @@ type Status = 'idle' | 'loading' | 'success' | 'error'
 const inputClass =
   'border border-gray-200 px-4 py-3 w-full focus:border-[#3F3E7A] outline-none text-sm text-[#111] bg-white transition-colors'
 
-const infoItems = [
-  { icon: '◉', label: 'Email', value: 'info@elitehandpan.com', href: 'mailto:info@elitehandpan.com' },
-  { icon: '◉', label: 'Phone', value: '+98 900 000 0000', href: 'tel:+989000000000' },
-  { icon: '◉', label: 'WhatsApp', value: 'Chat on WhatsApp', href: 'https://wa.me/989000000000' },
-  { icon: '◉', label: 'Instagram', value: '@elitehandpan', href: 'https://instagram.com/elitehandpan' },
-  { icon: '◉', label: 'Address', value: 'Tehran, Iran', href: null },
-]
-
-export default function ContactForm() {
+export default function ContactForm({ locale }: { locale: string }) {
+  const isFa = locale === 'fa'
   const { executeRecaptcha } = useGoogleReCaptcha()
   const [status, setStatus] = useState<Status>('idle')
   const [errorMsg, setErrorMsg] = useState('')
@@ -24,10 +17,31 @@ export default function ContactForm() {
     name: '', email: '', phone: '', subject: '', message: '',
   })
 
+  const infoItems = [
+    { icon: '◉', label: isFa ? 'ایمیل' : 'Email', value: 'info@elitehandpan.com', href: 'mailto:info@elitehandpan.com' },
+    { icon: '◉', label: isFa ? 'تلفن' : 'Phone', value: '+98 900 000 0000', href: 'tel:+989000000000' },
+    { icon: '◉', label: 'WhatsApp', value: isFa ? 'گفتگو در واتساپ' : 'Chat on WhatsApp', href: 'https://wa.me/989000000000' },
+    { icon: '◉', label: isFa ? 'اینستاگرام' : 'Instagram', value: '@elitehandpan', href: 'https://instagram.com/elitehandpan' },
+    { icon: '◉', label: isFa ? 'آدرس' : 'Address', value: isFa ? 'تهران، ایران' : 'Tehran, Iran', href: null },
+  ]
+
+  const subjectOptions = [
+    { value: 'Instrument Inquiry', label: isFa ? 'استعلام ساز' : 'Instrument Inquiry' },
+    { value: 'Order Status', label: isFa ? 'وضعیت سفارش' : 'Order Status' },
+    { value: 'Warranty', label: isFa ? 'گارانتی' : 'Warranty' },
+    { value: 'Other', label: isFa ? 'سایر' : 'Other' },
+  ]
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+    const { name, value } = e.target
+    if (name === 'phone') {
+      // Only allow digits, spaces, +, -, and parentheses — strips anything else as you type
+      setForm((prev) => ({ ...prev, phone: value.replace(/[^0-9+\-\s()]/g, '') }))
+      return
+    }
+    setForm((prev) => ({ ...prev, [name]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,12 +49,20 @@ export default function ContactForm() {
     setStatus('loading')
     setErrorMsg('')
 
+    if (!executeRecaptcha) {
+      setStatus('error')
+      setErrorMsg(
+        isFa
+          ? 'در حال آماده‌سازی امنیتی صفحه هستیم، چند ثانیه صبر کنید و دوباره امتحان کنید.'
+          : 'Security check is still loading — please wait a moment and try again.'
+      )
+      return
+    }
+
     const formData = new FormData(e.currentTarget)
     const payload = Object.fromEntries(formData.entries())
 
-    const recaptchaToken = executeRecaptcha
-      ? await executeRecaptcha('contact_form')
-      : ''
+    const recaptchaToken = await executeRecaptcha('contact_form')
 
     try {
       const res = await fetch('/api/contact', {
@@ -55,11 +77,11 @@ export default function ContactForm() {
         setForm({ name: '', email: '', phone: '', subject: '', message: '' })
       } else {
         setStatus('error')
-        setErrorMsg(data.error ?? 'Something went wrong.')
+        setErrorMsg(data.error ?? (isFa ? 'مشکلی پیش آمد.' : 'Something went wrong.'))
       }
     } catch {
       setStatus('error')
-      setErrorMsg('Network error. Please try again.')
+      setErrorMsg(isFa ? 'خطای شبکه. دوباره تلاش کنید.' : 'Network error. Please try again.')
     }
   }
 
@@ -75,17 +97,17 @@ export default function ContactForm() {
               className="text-xl text-[#111]"
               style={{ fontFamily: 'var(--font-cormorant)' }}
             >
-              Message sent successfully.
+              {isFa ? 'پیام شما با موفقیت ارسال شد.' : 'Message sent successfully.'}
             </p>
             <p className="text-sm text-gray-500" style={{ fontFamily: 'var(--font-inter)' }}>
-              We&apos;ll get back to you as soon as possible.
+              {isFa ? 'در اسرع وقت با شما تماس خواهیم گرفت.' : "We'll get back to you as soon as possible."}
             </p>
             <button
               onClick={() => setStatus('idle')}
               className="mt-4 text-xs tracking-widest uppercase text-[#3F3E7A] border border-[#3F3E7A] px-4 py-2 hover:bg-[#3F3E7A] hover:text-black transition-colors"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
-              Send another
+              {isFa ? 'ارسال پیام دیگر' : 'Send another'}
             </button>
           </div>
         ) : (
@@ -97,7 +119,7 @@ export default function ContactForm() {
               <input
                 name="name"
                 type="text"
-                placeholder="Name *"
+                placeholder={isFa ? 'نام *' : 'Name *'}
                 value={form.name}
                 onChange={handleChange}
                 required
@@ -108,20 +130,22 @@ export default function ContactForm() {
               <input
                 name="email"
                 type="email"
-                placeholder="Email *"
+                placeholder={isFa ? 'ایمیل (اختیاری)' : 'Email (optional)'}
                 value={form.email}
                 onChange={handleChange}
-                required
                 className={inputClass}
                 style={{ fontFamily: 'var(--font-inter)' }}
               />
               <input
                 name="phone"
                 type="tel"
-                placeholder="Phone *"
+                placeholder={isFa ? 'تلفن *' : 'Phone *'}
                 value={form.phone}
                 onChange={handleChange}
                 required
+                pattern="[0-9+\-\s()]{6,20}"
+                title="Numbers, spaces, +, - and () only"
+                maxLength={20}
                 className={inputClass}
                 style={{ fontFamily: 'var(--font-inter)' }}
               />
@@ -133,15 +157,14 @@ export default function ContactForm() {
                 className={`${inputClass} text-gray-500`}
                 style={{ fontFamily: 'var(--font-inter)' }}
               >
-                <option value="" disabled>Subject *</option>
-                <option value="Instrument Inquiry">Instrument Inquiry</option>
-                <option value="Order Status">Order Status</option>
-                <option value="Warranty">Warranty</option>
-                <option value="Other">Other</option>
+                <option value="" disabled>{isFa ? 'موضوع *' : 'Subject *'}</option>
+                {subjectOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
               </select>
               <textarea
                 name="message"
-                placeholder="Message *"
+                placeholder={isFa ? 'پیام *' : 'Message *'}
                 value={form.message}
                 onChange={handleChange}
                 required
@@ -163,7 +186,7 @@ export default function ContactForm() {
                 className="w-full bg-[#3F3E7A] hover:bg-[#b8943e] disabled:opacity-60 text-black text-sm tracking-widest uppercase py-4 transition-colors"
                 style={{ fontFamily: 'var(--font-inter)' }}
               >
-                {status === 'loading' ? 'Sending…' : 'Send Message'}
+                {status === 'loading' ? (isFa ? 'در حال ارسال…' : 'Sending…') : (isFa ? 'ارسال پیام' : 'Send Message')}
               </button>
             </div>
           </form>
@@ -176,7 +199,7 @@ export default function ContactForm() {
           className="text-2xl font-light text-[#111]"
           style={{ fontFamily: 'var(--font-cormorant)' }}
         >
-          Our Information
+          {isFa ? 'اطلاعات تماس' : 'Our Information'}
         </h2>
         <div className="w-10 h-px bg-[#3F3E7A] mt-2 mb-8" />
 
@@ -210,20 +233,6 @@ export default function ContactForm() {
             </li>
           ))}
         </ul>
-
-        {/* Google Maps — Tehran */}
-        <div className="w-full rounded-sm overflow-hidden border border-gray-100">
-          <iframe
-            title="Elite Handpan — Tehran"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d414099.4847495478!2d50.85204897440697!3d35.69938784720736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3f8e00491ff3dcd9%3A0xf0b3697c567d4bef!2sTehran%2C%20Tehran%20Province%2C%20Iran!5e0!3m2!1sen!2s!4v1719000000000!5m2!1sen!2s"
-            width="100%"
-            height="260"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
       </div>
     </div>
   )

@@ -1,0 +1,124 @@
+import Link from 'next/link'
+import { supabaseAdmin } from '../../../../../lib/supabase-admin'
+import { updateFeatureSettings } from '../actions'
+
+const GOLD = '#3F3E7A'
+
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '11px 14px',
+  background: '#0a0a0a',
+  border: '1px solid #2a2a2a',
+  borderRadius: '4px',
+  color: '#f5f5f5',
+  fontSize: '14px',
+  outline: 'none',
+  boxSizing: 'border-box',
+  fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+  direction: 'ltr',
+}
+
+const labelStyle: React.CSSProperties = { display: 'block', fontSize: '13px', color: '#888', marginBottom: '8px' }
+const fieldStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column' }
+
+const cardStyle: React.CSSProperties = {
+  background: '#111',
+  border: '1px solid #1e1e1e',
+  borderRadius: '8px',
+  padding: '32px',
+  maxWidth: '680px',
+}
+
+const saveButtonStyle: React.CSSProperties = {
+  alignSelf: 'flex-start',
+  padding: '12px 28px',
+  background: GOLD,
+  border: 'none',
+  borderRadius: '4px',
+  color: '#0a0a0a',
+  fontSize: '14px',
+  fontWeight: 600,
+  cursor: 'pointer',
+  fontFamily: 'var(--font-vazirmatn), Arial, sans-serif',
+  marginTop: '8px',
+}
+
+function SuccessBanner({ show, text }: { show: boolean; text: string }) {
+  if (!show) return null
+  return (
+    <div style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '6px', padding: '12px 18px', marginBottom: '20px', color: '#4ade80', fontSize: '13px' }}>
+      ✓ {text}
+    </div>
+  )
+}
+
+function ErrorBanner({ show, text }: { show: boolean; text: string }) {
+  if (!show) return null
+  return (
+    <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '6px', padding: '12px 18px', marginBottom: '20px', color: '#f87171', fontSize: '13px' }}>
+      {text}
+    </div>
+  )
+}
+
+export default async function FeatureSettingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ success?: string; error?: string }>
+}) {
+  const { success, error: errorCode } = await searchParams
+
+  const { data: settings } = await supabaseAdmin
+    .from('site_settings')
+    .select('*')
+    .eq('id', 1)
+    .maybeSingle()
+
+  return (
+    <div>
+      <div style={{ marginBottom: '40px' }}>
+        <Link href="/admin/dashboard/settings" style={{ color: GOLD, fontSize: '11px', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '8px', display: 'inline-block', textDecoration: 'none' }}>
+          ← تنظیمات
+        </Link>
+        <h1 style={{ fontSize: '28px', fontWeight: '300', color: '#f5f5f5', margin: 0 }}>ویژگی‌های صفحه محصول</h1>
+        <div style={{ width: '40px', height: '1px', background: GOLD, marginTop: '16px', opacity: 0.5 }} />
+      </div>
+
+      <div style={cardStyle}>
+        <p style={{ fontSize: '12px', color: '#666', marginBottom: '24px' }}>
+          سه بلاک پایین صفحه هر محصول (مثل High Quality، گارانتی، ارسال). اگر عنوان یا متن یک زبان خالی بماند، آن بلاک برای همان زبان نمایش داده نمی‌شود.
+        </p>
+        <SuccessBanner show={success === '1'} text="ویژگی‌ها ذخیره شد" />
+        <ErrorBanner show={!!errorCode} text={errorCode === 'db' ? 'خطا در ذخیره تنظیمات' : ''} />
+        <form action={updateFeatureSettings} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
+          {[1, 2, 3].map((n) => (
+            <div key={n} style={{ display: 'flex', flexDirection: 'column', gap: '12px', paddingBottom: '20px', borderBottom: n < 3 ? '1px solid #1e1e1e' : 'none' }}>
+              <p style={{ fontSize: '12px', color: GOLD, margin: 0 }}>بلاک {n}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>عنوان (انگلیسی)</label>
+                  <input name={`feature${n}_title_en`} defaultValue={settings?.[`feature${n}_title_en`] ?? ''} style={inputStyle} />
+                </div>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>عنوان (فارسی)</label>
+                  <input name={`feature${n}_title_fa`} defaultValue={settings?.[`feature${n}_title_fa`] ?? ''} style={{ ...inputStyle, direction: 'rtl' }} />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>متن (انگلیسی)</label>
+                  <textarea name={`feature${n}_body_en`} rows={2} defaultValue={settings?.[`feature${n}_body_en`] ?? ''} style={{ ...inputStyle, resize: 'vertical' }} />
+                </div>
+                <div style={fieldStyle}>
+                  <label style={labelStyle}>متن (فارسی)</label>
+                  <textarea name={`feature${n}_body_fa`} rows={2} defaultValue={settings?.[`feature${n}_body_fa`] ?? ''} style={{ ...inputStyle, resize: 'vertical', direction: 'rtl' }} />
+                </div>
+              </div>
+            </div>
+          ))}
+          <button type="submit" style={saveButtonStyle}>ذخیره ویژگی‌ها</button>
+        </form>
+      </div>
+    </div>
+  )
+}

@@ -4,6 +4,7 @@ import Navbar from '../../../../components/Navbar'
 import Footer from '../../../../components/Footer'
 import AccessoryDetail from './AccessoryDetail'
 import { supabaseAdmin } from '../../../../../lib/supabase-admin'
+import { getProductFeatures } from '../../../../../lib/getProductFeatures'
 
 export default async function AccessoryPage({
   params,
@@ -29,11 +30,12 @@ export default async function AccessoryPage({
 
   const images = imageRows?.map((r) => r.url) ?? []
   const dict = await getDictionary(locale as 'en' | 'fa')
+  const features = await getProductFeatures(locale)
 
   return (
     <>
       <Navbar dict={dict} locale={locale} />
-      <AccessoryDetail accessory={accessory} images={images} locale={locale} dict={dict} />
+      <AccessoryDetail accessory={accessory} images={images} locale={locale} dict={dict} features={features} />
       <Footer locale={locale} />
     </>
   )

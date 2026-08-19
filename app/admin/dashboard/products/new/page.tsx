@@ -68,6 +68,7 @@ function SubmitButton() {
 export default function NewProductPage() {
   const [slug, setSlug] = useState('')
   const [inStock, setInStock] = useState(true)
+  const [isFeatured, setIsFeatured] = useState(false)
   const [previews, setPreviews] = useState<string[]>([])
 
   function handleNameEnChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -75,7 +76,7 @@ export default function NewProductPage() {
   }
 
   function handleImagesChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(e.target.files ?? []).slice(0, 3)
+    const files = Array.from(e.target.files ?? [])
     setPreviews(files.map((f) => URL.createObjectURL(f)))
   }
 
@@ -92,6 +93,7 @@ export default function NewProductPage() {
       <form action={createProduct}>
         {/* Hidden in_stock field — updated by the toggle button */}
         <input type="hidden" name="in_stock" value={String(inStock)} />
+        <input type="hidden" name="is_featured" value={String(isFeatured)} />
 
         <div
           style={{
@@ -181,6 +183,18 @@ export default function NewProductPage() {
             </div>
           </div>
 
+          {/* Installment price (Toman) */}
+          <div style={fieldStyle}>
+            <label style={labelStyle}>قیمت قسطی (تومان)</label>
+            <input
+              name="price_installment_fa"
+              type="number"
+              min={0}
+              placeholder="64000000"
+              style={{ ...inputStyle, direction: 'ltr' }}
+            />
+          </div>
+
           {/* Descriptions */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
             <div style={fieldStyle}>
@@ -251,9 +265,47 @@ export default function NewProductPage() {
             </span>
           </div>
 
+          {/* Featured toggle */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <span style={labelStyle}>پیشنهاد ویژه (نمایش در صفحه شاپ)</span>
+            <button
+              type="button"
+              onClick={() => setIsFeatured((v) => !v)}
+              aria-label="تغییر وضعیت پیشنهاد ویژه"
+              style={{
+                position: 'relative',
+                width: '52px',
+                height: '28px',
+                borderRadius: '14px',
+                background: isFeatured ? GOLD : '#2a2a2a',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  position: 'absolute',
+                  top: '4px',
+                  right: isFeatured ? '4px' : '24px',
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  background: '#fff',
+                  transition: 'right 0.2s',
+                  display: 'block',
+                }}
+              />
+            </button>
+            <span style={{ color: isFeatured ? '#8f8dd6' : '#666', fontSize: '13px' }}>
+              {isFeatured ? '★ ویژه' : '☆ عادی'}
+            </span>
+          </div>
+
           {/* Image upload */}
           <div style={fieldStyle}>
-            <label style={labelStyle}>تصاویر محصول (حداکثر ۳ تصویر)</label>
+            <label style={labelStyle}>تصاویر محصول</label>
             <div
               style={{
                 border: '1px dashed #2a2a2a',

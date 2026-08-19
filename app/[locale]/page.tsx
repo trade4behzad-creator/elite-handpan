@@ -21,7 +21,7 @@ export default async function LocalePage({
     <main>
       <Navbar dict={dict} locale={locale} />
       <HeroSection dict={dict} locale={locale} />
-      <AboutSection locale={locale} />
+      <AboutSection dict={dict} locale={locale} />
       <ProductsSection dict={dict} locale={locale} />
       <Footer locale={locale} />
     </main>

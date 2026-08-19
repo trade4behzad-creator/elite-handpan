@@ -268,21 +268,29 @@ export default function HeroSection({
           ref={textRef}
           className="absolute inset-0 flex flex-col items-center justify-center text-center px-4"
         >
+          {/* Dark vignette behind the text so it stays readable over any frame */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                'radial-gradient(ellipse 70% 55% at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 55%, transparent 80%)',
+            }}
+          />
           <p
-            className="text-[#3F3E7A] tracking-[0.35em] text-xs uppercase mb-6"
-            style={{ fontFamily: 'var(--font-inter)' }}
+            className="relative text-[#3F3E7A] tracking-[0.35em] text-xs uppercase mb-6"
+            style={{ fontFamily: 'var(--font-inter)', textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
           >
             {dict.hero.eyebrow}
           </p>
           <h1
-            className="text-4xl md:text-7xl font-light text-white leading-tight"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
+            className="relative text-4xl md:text-7xl font-light text-white leading-tight"
+            style={{ fontFamily: 'var(--font-cormorant)', textShadow: '0 4px 24px rgba(0,0,0,0.7)' }}
           >
             {dict.hero.title}
           </h1>
           <p
-            className="text-[#888888] mt-6 text-sm md:text-lg max-w-md"
-            style={{ fontFamily: 'var(--font-inter)' }}
+            className="relative text-white/80 mt-6 text-sm md:text-lg max-w-md"
+            style={{ fontFamily: 'var(--font-inter)', textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}
           >
             {dict.hero.subtitle}
           </p>

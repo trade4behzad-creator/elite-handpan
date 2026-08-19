@@ -1,76 +1,43 @@
-'use client'
+import type { Dictionary } from '../i18n'
+import { supabaseAdmin } from '../../lib/supabase-admin'
+import SpecialOfferContent from './SpecialOfferContent'
+import type { SpecialOfferProduct } from './SpecialOfferContent'
 
-import { motion } from 'framer-motion'
-import Link from 'next/link'
+// Homepage "Special Offer" section — shows the single product the admin
+// has marked as `is_home_featured` in the products dashboard.
+// Renders nothing if no product is currently selected.
+export default async function AboutSection({
+  dict,
+  locale,
+}: {
+  dict: Dictionary
+  locale: string
+}) {
+  const { data: product, error } = await supabaseAdmin
+    .from('products')
+    .select('name_en, name_fa, slug, scale, notes, price, price_fa, description_en, description_fa, product_images(url, sort_order)')
+    .eq('is_home_featured', true)
+    .maybeSingle()
 
-export default function AboutSection({ locale }: { locale: string }) {
-  return (
-    <section
-      className="bg-white py-24 px-4 md:px-8 lg:px-16"
-      style={{ position: 'relative', zIndex: 10 }}
-    >
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
-        {/* LEFT: text — order-2 on mobile so image shows first */}
-        <motion.div
-          initial={{ opacity: 0, x: -60 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="order-2 md:order-1 flex flex-col gap-6"
-        >
-          <p
-            className="text-[#3F3E7A] tracking-widest text-xs uppercase"
-            style={{ fontFamily: 'var(--font-inter)' }}
-          >
-            OUR STORY
-          </p>
-          <h2
-            className="text-4xl font-light text-[#111111] leading-tight"
-            style={{ fontFamily: 'var(--font-cormorant)' }}
-          >
-            Crafted from the Heart of Metal
-          </h2>
-          <p
-            className="text-gray-600 text-base leading-relaxed"
-            style={{ fontFamily: 'var(--font-inter)' }}
-          >
-            Each Elite handpan begins as raw steel and is shaped by hand over weeks
-            of precise craftsmanship. We forge instruments that don&apos;t just
-            sound — they resonate.
-          </p>
-          <Link
-            href={`/${locale}/about`}
-            className="self-start border border-[#3F3E7A] text-[#3F3E7A] text-sm tracking-wider px-6 py-3 transition-all duration-300 hover:bg-[#3F3E7A] hover:text-white"
-            style={{ fontFamily: 'var(--font-inter)' }}
-          >
-            Discover Our Story
-          </Link>
-        </motion.div>
+  if (error) console.error('AboutSection (special offer) error:', error)
+  if (!product) return null
 
-        {/* RIGHT: image with radial glow — order-1 on mobile */}
-        <motion.div
-          initial={{ opacity: 0, x: 60 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: 'easeOut' }}
-          className="order-1 md:order-2 relative flex items-center justify-center"
-        >
-          {/* Warm gold halo behind image */}
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background:
-                'radial-gradient(ellipse at center, rgba(201,168,76,0.28) 0%, rgba(201,168,76,0.08) 45%, transparent 70%)',
-            }}
-          />
-          <img
-            src="/images/about.jpg"
-            alt="Elite Handpan craftsmanship"
-            className="relative w-full max-w-md object-cover rounded-sm"
-            style={{ aspectRatio: '4/5' }}
-          />
-        </motion.div>
-      </div>
-    </section>
-  )
+  const imageUrl =
+    (product.product_images as { url: string; sort_order: number }[] | null)
+      ?.sort((a, b) => a.sort_order - b.sort_order)?.[0]?.url ?? null
+
+  const offerProduct: SpecialOfferProduct = {
+    name_en: product.name_en,
+    name_fa: product.name_fa,
+    slug: product.slug,
+    scale: product.scale,
+    notes: product.notes,
+    price: product.price,
+    price_fa: product.price_fa,
+    description_en: product.description_en,
+    description_fa: product.description_fa,
+    imageUrl,
+  }
+
+  return <SpecialOfferContent product={offerProduct} dict={dict} locale={locale} />
 }

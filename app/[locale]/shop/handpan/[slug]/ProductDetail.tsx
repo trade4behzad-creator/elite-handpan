@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Dictionary } from '../../../../i18n'
+import { useCart } from '../../../../context/CartContext'
 
 type Product = {
   id: string
@@ -13,17 +15,13 @@ type Product = {
   notes: number
   price: number
   price_fa: number | null
+  price_installment: number | null
+  price_installment_fa: number | null
   description_en: string | null
   description_fa: string | null
   note_arrangement: string | null
   in_stock: boolean
 }
-
-const features = [
-  { title: 'High Quality', body: 'Each instrument is crafted with premium materials and rigorous quality control.' },
-  { title: '2-Year Warranty', body: 'All Elite instruments come with a full two-year warranty including retuning service.' },
-  { title: 'Worldwide Shipping', body: 'Professional packaging and tracked shipping to anywhere in the world.' },
-]
 
 function ImagePlaceholder() {
   return (
@@ -39,13 +37,33 @@ export default function ProductDetail({
   images,
   locale,
   dict,
+  features,
 }: {
   product: Product
   images: string[]
   locale: string
   dict: Dictionary
+  features: { title: string; body: string }[]
 }) {
   const [activeImage, setActiveImage] = useState(0)
+  const { addItem } = useCart()
+  const router = useRouter()
+
+  function handleInquire() {
+    addItem({
+      id: product.id,
+      category: 'handpan',
+      slug: product.slug,
+      name_en: product.name_en,
+      name_fa: product.name_fa,
+      image: images[0] ?? null,
+      price: product.price,
+      price_fa: product.price_fa,
+      price_installment: product.price_installment,
+      price_installment_fa: product.price_installment_fa,
+    })
+    router.push(`/${locale}/cart`)
+  }
 
   const name = locale === 'fa' && product.name_fa ? product.name_fa : product.name_en
   const description =
@@ -163,15 +181,14 @@ export default function ProductDetail({
               </div>
             )}
 
-            <a
-              href="https://wa.me/989000000000"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-[#3F3E7A] hover:bg-[#b8943e] text-black text-sm tracking-widest uppercase py-4 text-center transition-colors font-medium"
+            <button
+              type="button"
+              onClick={handleInquire}
+              className="w-full bg-[#3F3E7A] hover:opacity-90 text-white text-sm tracking-widest uppercase py-4 text-center transition-opacity font-medium"
               style={{ fontFamily: 'var(--font-inter)' }}
             >
-              {dict.products.cta}
-            </a>
+              {dict.products.addToCart}
+            </button>
           </div>
         </div>
 
@@ -200,21 +217,23 @@ export default function ProductDetail({
       </main>
 
       {/* Features row */}
-      <section className="bg-[#f9f9f9] py-16 px-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((f) => (
-            <div key={f.title} className="bg-white p-8 rounded-sm border border-gray-100">
-              <p className="text-[#3F3E7A] text-xl mb-4">✦</p>
-              <h3 className="text-lg font-semibold text-[#111111] mb-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
-                {f.title}
-              </h3>
-              <p className="text-sm text-gray-500 leading-relaxed" style={{ fontFamily: 'var(--font-inter)' }}>
-                {f.body}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {features.length > 0 && (
+        <section className="bg-[#f9f9f9] py-16 px-8">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+            {features.map((f) => (
+              <div key={f.title} className="bg-white p-8 rounded-sm border border-gray-100">
+                <p className="text-[#3F3E7A] text-xl mb-4">✦</p>
+                <h3 className="text-lg font-semibold text-[#111111] mb-2" style={{ fontFamily: 'var(--font-cormorant)' }}>
+                  {f.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed" style={{ fontFamily: 'var(--font-inter)' }}>
+                  {f.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
     </>
   )
 }
