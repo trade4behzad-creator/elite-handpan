@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '../../../../lib/supabase-admin'
 import { createFaq, updateFaq, deleteFaq, reorderFaq } from './actions'
 import FaqFormFields from './FaqFormFields'
+import StopPropagation from './StopPropagation'
 
 const GOLD = '#3F3E7A'
 
@@ -64,7 +65,7 @@ export default async function FaqAdminPage() {
           <details key={faq.id} style={{ background: '#111', border: '1px solid #1e1e1e', borderRadius: '8px' }}>
             <summary style={{ padding: '16px 24px', cursor: 'pointer', color: '#f5f5f5', fontSize: '13px', listStyle: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
               <span style={{ direction: 'ltr', textAlign: 'left', flex: 1 }}>{faq.question_en}</span>
-              <span style={{ display: 'flex', gap: '4px', flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
+              <StopPropagation>
                 <form action={handleReorder}>
                   <input type="hidden" name="id" value={faq.id} />
                   <input type="hidden" name="direction" value="up" />
@@ -75,7 +76,7 @@ export default async function FaqAdminPage() {
                   <input type="hidden" name="direction" value="down" />
                   <button type="submit" disabled={i === (faqs?.length ?? 0) - 1} style={{ width: '24px', height: '22px', background: 'transparent', border: '1px solid #2a2a2a', borderRadius: '4px', color: i === (faqs?.length ?? 0) - 1 ? '#333' : '#888', cursor: i === (faqs?.length ?? 0) - 1 ? 'not-allowed' : 'pointer', fontSize: '11px' }}>▼</button>
                 </form>
-              </span>
+              </StopPropagation>
             </summary>
             <form action={updateFaq} style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <input type="hidden" name="id" value={faq.id} />
